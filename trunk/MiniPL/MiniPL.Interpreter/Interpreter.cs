@@ -24,8 +24,8 @@ namespace MiniPL.Interpreter
                 Console.WriteLine("Too many parameters");
                 return;
             }
-            var fileReader = new FileReader();
-            var scanner = new Scanner();
+            //var fileReader = new FileReader();
+            //var scanner = new Scanner();
         }
     }
 }

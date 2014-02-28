@@ -45,6 +45,16 @@
     <Compile Include="ScannerTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\MiniPL.Exceptions\MiniPL.Exceptions.csproj">
+      <Project>{3c775989-bec5-475d-b5d1-cf4361b7ca68}</Project>
+      <Name>MiniPL.Exceptions</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\MiniPL.IO\MiniPL.IO.csproj">
+      <Project>{E2A8789C-9928-4A83-8A78-54D2D6F3D1EB}</Project>
+      <Name>MiniPL.IO</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
