@@ -33,7 +33,7 @@ namespace MiniPL.UnitTests
             
             var tokens = _scanner.Tokenize(lines);
 
-            Assert.IsTrue(3 >= tokens.Count);
+            Assert.IsTrue(3 <= tokens.Count);
             
             Assert.IsTrue(tokens.Exists(x =>
                                   x.Lexeme == Type.Int &&
@@ -160,6 +160,90 @@ namespace MiniPL.UnitTests
                               ));
 
             #endregion
+        }
+
+        [Test]
+        public void TestCanTokenizeReservedKeyWords()
+        {
+            var lines = new List<string>
+                            {
+                                "var x : int := (4 + (6 * 2))/(2-0);",
+                                "var y : bool := !true & true;",
+                                "var z : bool := 3 < 2;",
+                                "assert(x > 2);",
+                                "assert(3 >= 2);",
+                                "assert(x <= 12);",
+                                "assert(x = 8);",
+                                "for x in 0..nTimes-1 do", 
+                                "print x;",
+                                "end for;",
+                                "read nTimes;"
+                            };
+
+            var tokens = _scanner.Tokenize(lines);
+            Assert.IsTrue(12 <= tokens.Count);
+
+            Assert.IsTrue(tokens.Exists(x =>
+                                  x.Lexeme == ReservedKeyword.Assert &&
+                                  x.Line == 4 &&
+                                  x.StartColumn == 1
+                              ));
+            Assert.IsTrue(tokens.Exists(x =>
+                                  x.Lexeme == ReservedKeyword.Do &&
+                                  x.Line == 8 &&
+                                  x.StartColumn == 22
+                              ));
+            Assert.IsTrue(tokens.Exists(x =>
+                                  x.Lexeme == ReservedKeyword.End &&
+                                  x.Line == 10 &&
+                                  x.StartColumn == 1
+                              ));
+            Assert.IsTrue(tokens.Exists(x =>
+                                  x.Lexeme == ReservedKeyword.For &&
+                                  x.Line == 8 &&
+                                  x.StartColumn == 1
+                              ));
+            Assert.IsTrue(tokens.Exists(x =>
+                                  x.Lexeme == ReservedKeyword.In &&
+                                  x.Line == 8 &&
+                                  x.StartColumn == 7
+                              ));
+            Assert.IsTrue(tokens.Exists(x =>
+                                  x.Lexeme == ReservedKeyword.Print &&
+                                  x.Line == 9 &&
+                                  x.StartColumn == 1
+                              ));
+            Assert.IsTrue(tokens.Exists(x =>
+                                  x.Lexeme == ReservedKeyword.Read &&
+                                  x.Line == 11 &&
+                                  x.StartColumn == 1
+                              ));
+            Assert.IsTrue(tokens.Exists(x =>
+                                  x.Lexeme == ReservedKeyword.Var &&
+                                  x.Line == 3 &&
+                                  x.StartColumn == 1
+                              ));
+
+            Assert.IsTrue(tokens.Exists(x =>
+                                  x.Lexeme == ReservedKeyword.Assignment &&
+                                  x.Line == 2 &&
+                                  x.StartColumn == 14
+                              ));
+            Assert.IsTrue(tokens.Exists(x =>
+                                  x.Lexeme == ReservedKeyword.Colon &&
+                                  x.Line == 1 &&
+                                  x.StartColumn == 7
+                              ));
+            Assert.IsTrue(tokens.Exists(x =>
+                                  x.Lexeme == ReservedKeyword.Range &&
+                                  x.Line == 8 &&
+                                  x.StartColumn == 11
+                              ));
+            Assert.IsTrue(tokens.Exists(x =>
+                                  x.Lexeme == ReservedKeyword.Semicolon &&
+                                  x.Line == 6 &&
+                                  x.StartColumn == 16
+                              ));
         }
     }
 }

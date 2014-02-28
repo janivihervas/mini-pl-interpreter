@@ -32,17 +32,23 @@ namespace MiniPL.FrontEnd
                     SkipWhiteSpace(line);
                     Token token;
 
+                    if ( (token = CreateTypeToken(line)) != null )
+                    {
+                        tokens.Add(token);
+                        continue;
+                    }
+                    if ( (token = CreateReservedKeywordToken(line)) != null )
+                    {
+                        tokens.Add(token);
+                        continue;
+                    }
+
                     if ( (token = CreateOperatorToken(line)) != null )
                     {
                         tokens.Add(token);
                         continue;
                     }
 
-                    if ( (token = CreateTypeToken(line)) != null )
-                    {
-                        tokens.Add(token);
-                        continue;
-                    }
                     _column++; // TODO: Remove this when fully implemented
                 }
             }
@@ -72,11 +78,18 @@ namespace MiniPL.FrontEnd
         /// <returns>Created token or null</returns>
         private Token CreateToken(string line, string symbol)
         {
-            if ( line.Substring(_column, symbol.Length) == symbol )
+            // One can make this to work a lot faster, but this is nicer
+            try
             {
-                var token = new Token(_row, _column, symbol);
-                _column += symbol.Length;
-                return token;
+                if ( line.Substring(_column, symbol.Length) == symbol )
+                {
+                    var token = new Token(_row, _column, symbol);
+                    _column += symbol.Length;
+                    return token;
+                }
+            }
+            catch (ArgumentOutOfRangeException)
+            {
             }
             return null;
         }
@@ -93,6 +106,29 @@ namespace MiniPL.FrontEnd
             return symbols.Select(symbol => CreateToken(line, symbol)).FirstOrDefault(token => token != null);
         }
 
+
+        /// <summary>
+        /// Creates a new token for reserved keywords
+        /// </summary>
+        /// <param name="line">Current line</param>
+        /// <returns>New token for reserved keywords or null</returns>
+        private Token CreateReservedKeywordToken(string line)
+        {
+            return CreateToken(line, new[] { ReservedKeyword.Assignment, 
+                                                  ReservedKeyword.Colon, 
+                                                  ReservedKeyword.Semicolon, 
+                                                  ReservedKeyword.Range, 
+                                                  ReservedKeyword.Do, 
+                                                  ReservedKeyword.In, 
+                                                  ReservedKeyword.End, 
+                                                  ReservedKeyword.For, 
+                                                  ReservedKeyword.Var, 
+                                                  ReservedKeyword.Read, 
+                                                  ReservedKeyword.Print, 
+                                                  ReservedKeyword.Assert,  });
+        }
+
+        
         /// <summary>
         /// Creates a new token for variable types
         /// </summary>
@@ -100,15 +136,7 @@ namespace MiniPL.FrontEnd
         /// <returns>New token for variable types or null, if it wasn't a type token</returns>
         private Token CreateTypeToken(string line)
         {
-            Token token = null;
-            try
-            {
-                token = CreateToken(line, new[] {Type.Int, Type.Bool, Type.String});
-            }
-            catch ( ArgumentOutOfRangeException ) // _column to end of line was less then Type.Int.Length
-            {
-            }
-            return token;
+            return CreateToken(line, new[] {Type.Int, Type.Bool, Type.String});
         }
 
         
@@ -119,19 +147,11 @@ namespace MiniPL.FrontEnd
         /// <returns>New token for operators or null, if it wasn't an operator token</returns>
         private Token CreateOperatorToken(string line)
         {
-            Token token = null;
-            try
-            {
-                token = CreateToken(line, new[] { Operator.Plus, Operator.Minus, Operator.Multiply, Operator.Divide,
+            return CreateToken(line, new[] { Operator.Plus, Operator.Minus, Operator.Multiply, Operator.Divide,
                                                   Operator.ParenthesisLeft, Operator.ParenthesisRight,
                                                   Operator.And, Operator.Not,
                                                   Operator.GreaterOrEqualThan, Operator.LesserOrEqualThan, 
                                                   Operator.GreaterThan, Operator.LesserThan, Operator.Equal });
-            }
-            catch ( ArgumentOutOfRangeException ) 
-            {
-            }
-            return token;
         }
 
     }
