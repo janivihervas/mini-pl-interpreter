@@ -48,6 +48,10 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\MiniPL.Exceptions\MiniPL.Exceptions.csproj">
+      <Project>{3c775989-bec5-475d-b5d1-cf4361b7ca68}</Project>
+      <Name>MiniPL.Exceptions</Name>
+    </ProjectReference>
     <ProjectReference Include="..\MiniPL.FrontEnd\MiniPL.FrontEnd.csproj">
       <Project>{678DB092-2BCE-49EA-9925-6F96FBFAA736}</Project>
       <Name>MiniPL.FrontEnd</Name>

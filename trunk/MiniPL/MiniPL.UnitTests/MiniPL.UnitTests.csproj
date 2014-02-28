@@ -50,6 +50,14 @@
       <Project>{3c775989-bec5-475d-b5d1-cf4361b7ca68}</Project>
       <Name>MiniPL.Exceptions</Name>
     </ProjectReference>
+    <ProjectReference Include="..\MiniPL.FrontEnd\MiniPL.FrontEnd.csproj">
+      <Project>{678DB092-2BCE-49EA-9925-6F96FBFAA736}</Project>
+      <Name>MiniPL.FrontEnd</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\MiniPL.Interpreter\MiniPL.Interpreter.csproj">
+      <Project>{4A1A494D-C8FC-4E97-8FFA-1FE1BCB85E43}</Project>
+      <Name>MiniPL.Interpreter</Name>
+    </ProjectReference>
     <ProjectReference Include="..\MiniPL.IO\MiniPL.IO.csproj">
       <Project>{E2A8789C-9928-4A83-8A78-54D2D6F3D1EB}</Project>
       <Name>MiniPL.IO</Name>
