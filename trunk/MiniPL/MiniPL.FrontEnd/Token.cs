@@ -36,5 +36,14 @@
             StartColumn = startColumn + 1;
             Lexeme = lexeme;
         }
+
+        /// <summary>
+        /// Returns the lexeme
+        /// </summary>
+        /// <returns>Lexeme</returns>
+        public override string ToString()
+        {
+            return Lexeme;
+        }
     }
 }

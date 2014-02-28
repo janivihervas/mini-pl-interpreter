@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace MiniPL.FrontEnd
 {
@@ -31,10 +32,16 @@ namespace MiniPL.FrontEnd
                     SkipWhiteSpace(line);
                     Token token;
 
+                    if ( (token = CreateOperatorToken(line)) != null )
+                    {
+                        tokens.Add(token);
+                        continue;
+                    }
+
                     if ( (token = CreateTypeToken(line)) != null )
                     {
                         tokens.Add(token);
-                        break;
+                        continue;
                     }
                     _column++; // TODO: Remove this when fully implemented
                 }
@@ -42,6 +49,7 @@ namespace MiniPL.FrontEnd
 
             return tokens;
         }
+
 
         /// <summary>
         /// Skips whitespaces in the current line
@@ -57,37 +65,74 @@ namespace MiniPL.FrontEnd
 
 
         /// <summary>
+        /// Creates a token if it matches the given symbol
+        /// </summary>
+        /// <param name="line">Current line</param>
+        /// <param name="symbol">Symbol to match</param>
+        /// <returns>Created token or null</returns>
+        private Token CreateToken(string line, string symbol)
+        {
+            if ( line.Substring(_column, symbol.Length) == symbol )
+            {
+                var token = new Token(_row, _column, symbol);
+                _column += symbol.Length;
+                return token;
+            }
+            return null;
+        }
+
+
+        /// <summary>
+        /// Creates a token if it matches the given symbols
+        /// </summary>
+        /// <param name="line">Current line</param>
+        /// <param name="symbols">Symbols to match</param>
+        /// <returns>Created token or null</returns>
+        private Token CreateToken(string line, IEnumerable<string> symbols)
+        {
+            return symbols.Select(symbol => CreateToken(line, symbol)).FirstOrDefault(token => token != null);
+        }
+
+        /// <summary>
         /// Creates a new token for variable types
         /// </summary>
         /// <param name="line">Current line</param>
         /// <returns>New token for variable types or null, if it wasn't a type token</returns>
         private Token CreateTypeToken(string line)
         {
+            Token token = null;
             try
             {
-                if (line.Substring(_column, Type.Int.Length) == Type.Int)
-                {
-                    var token = new Token(_row, _column, Type.Int);
-                    _column += Type.Int.Length;
-                    return token;
-                }
-                if (line.Substring(_column, Type.Bool.Length) == Type.Bool)
-                {
-                    var token = new Token(_row, _column, Type.Bool);
-                    _column += Type.Bool.Length;
-                    return token;
-                }
-                if (line.Substring(_column, Type.String.Length) == Type.String)
-                {
-                    var token = new Token(_row, _column, Type.String);
-                    _column += Type.String.Length;
-                    return token;
-                }
-            } catch(ArgumentOutOfRangeException) // _column to end of line was less then Type.Int.Length
-            {
-                return null;
+                token = CreateToken(line, new[] {Type.Int, Type.Bool, Type.String});
             }
-            return null;
+            catch ( ArgumentOutOfRangeException ) // _column to end of line was less then Type.Int.Length
+            {
+            }
+            return token;
         }
+
+        
+        /// <summary>
+        /// Creates a new token for operators
+        /// </summary>
+        /// <param name="line">Current line</param>
+        /// <returns>New token for operators or null, if it wasn't an operator token</returns>
+        private Token CreateOperatorToken(string line)
+        {
+            Token token = null;
+            try
+            {
+                token = CreateToken(line, new[] { Operator.Plus, Operator.Minus, Operator.Multiply, Operator.Divide,
+                                                  Operator.ParenthesisLeft, Operator.ParenthesisRight,
+                                                  Operator.And, Operator.Not,
+                                                  Operator.GreaterOrEqualThan, Operator.LesserOrEqualThan, 
+                                                  Operator.GreaterThan, Operator.LesserThan, Operator.Equal });
+            }
+            catch ( ArgumentOutOfRangeException ) 
+            {
+            }
+            return token;
+        }
+
     }
 }

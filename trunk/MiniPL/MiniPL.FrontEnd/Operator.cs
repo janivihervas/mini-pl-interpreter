@@ -8,6 +8,8 @@
     /// </summary>
     public class Operator
     {
+        #region Arithmetic operators
+
         /// <summary>
         /// Plus operator
         /// </summary>
@@ -28,6 +30,9 @@
         /// </summary>
         public const string Multiply = "*";
 
+        #endregion
+
+        #region Comparison
 
         /// <summary>
         /// Lesser than operator
@@ -35,10 +40,28 @@
         public const string LesserThan = "<";
 
         /// <summary>
+        /// Lesser or equal than operator
+        /// </summary>
+        public const string LesserOrEqualThan = "<=";
+
+        /// <summary>
+        /// Greater than operator
+        /// </summary>
+        public const string GreaterThan = ">";
+
+        /// <summary>
+        /// Greater or equal than operator
+        /// </summary>
+        public const string GreaterOrEqualThan = ">=";
+
+        /// <summary>
         /// Equal operator
         /// </summary>
         public const string Equal = "=";
 
+        #endregion
+
+        #region Boolean
 
         /// <summary>
         /// Logical and operator
@@ -49,5 +72,18 @@
         /// Logical not operator
         /// </summary>
         public const string Not = "!";
+
+        #endregion
+
+        /// <summary>
+        /// Left parenthesis
+        /// </summary>
+        public const string ParenthesisLeft = "(";
+
+        /// <summary>
+        /// Right parenthesis
+        /// </summary>
+        public const string ParenthesisRight = ")";
+
     }
 }
