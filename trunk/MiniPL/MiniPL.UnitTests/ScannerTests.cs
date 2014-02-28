@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using MiniPL.FrontEnd;
 using NUnit.Framework;
 
@@ -244,6 +245,65 @@ namespace MiniPL.UnitTests
                                   x.Line == 6 &&
                                   x.StartColumn == 16
                               ));
+        }
+
+        
+        [Test]
+        public void TestScannerCanTokenizeTerminals()
+        {
+            var lines = new List<string>
+                            {
+                                "var x : int := 4;",
+                                "var y : bool := !true & false;",
+                                "var z : string := \"test\";" // TODO: write more comprehensive tests for string parsing
+                            };
+
+            var tokens = _scanner.Tokenize(lines);
+            Assert.IsTrue(4 <= tokens.Count);
+            var pass = false;
+
+            foreach (var token in tokens.Where(token => token.Lexeme == "4"))
+            {
+                Assert.AreEqual(4, ((TokenTerminal<int>) token).Value);
+                Assert.AreEqual(1, token.Line);
+                Assert.AreEqual(16, token.StartColumn);
+                pass = true;
+            }
+
+            Assert.IsTrue(pass);
+            pass = false;
+
+            foreach ( var token in tokens.Where(token => token.Lexeme == "true") )
+            {
+                Assert.AreEqual(true, ((TokenTerminal<bool>)token).Value);
+                Assert.AreEqual(2, token.Line);
+                Assert.AreEqual(18, token.StartColumn);
+                pass = true;
+            }
+
+            Assert.IsTrue(pass);
+            pass = false;
+
+            foreach ( var token in tokens.Where(token => token.Lexeme == "false") )
+            {
+                Assert.AreEqual(false, ((TokenTerminal<bool>)token).Value);
+                Assert.AreEqual(2, token.Line);
+                Assert.AreEqual(25, token.StartColumn);
+                pass = true;
+            }
+
+            Assert.IsTrue(pass);
+            pass = false;
+
+            foreach ( var token in tokens.Where(token => token.Lexeme == "test") )
+            {
+                Assert.AreEqual("test", ((TokenTerminal<string>)token).Value);
+                Assert.AreEqual(3, token.Line);
+                Assert.AreEqual(19, token.StartColumn); // '\' doesn't count
+                pass = true;
+            }
+
+            Assert.IsTrue(pass);
         }
     }
 }

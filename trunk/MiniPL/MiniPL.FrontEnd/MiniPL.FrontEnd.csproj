@@ -45,7 +45,14 @@
     <Compile Include="ReservedKeyword.cs" />
     <Compile Include="Scanner.cs" />
     <Compile Include="Token.cs" />
+    <Compile Include="TokenTerminal.cs" />
     <Compile Include="Type.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\MiniPL.Exceptions\MiniPL.Exceptions.csproj">
+      <Project>{3C775989-BEC5-475D-B5D1-CF4361B7CA68}</Project>
+      <Name>MiniPL.Exceptions</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

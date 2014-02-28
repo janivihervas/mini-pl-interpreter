@@ -25,7 +25,7 @@
 
 
         /// <summary>
-        /// Cretaes a new token. ATTENTION! This constructor handles the 0th column and row, DON'T add one to neither one.
+        /// Creates a new token. ATTENTION! This constructor handles the 0th column and row, DON'T add one to neither one.
         /// </summary>
         /// <param name="line">Current line of the source code.</param>
         /// <param name="startColumn">Starting column of the lexeme.</param>
@@ -35,6 +35,18 @@
             Line = line + 1;
             StartColumn = startColumn + 1;
             Lexeme = lexeme;
+        }
+
+
+        /// <summary>
+        /// Creates a new token. ATTENTION! This constructor handles the 0th column and row, DON'T add one to neither one.
+        /// </summary>
+        /// <param name="line">Current line of the source code.</param>
+        /// <param name="startColumn">Starting column of the lexeme.</param>
+        protected Token(int line, int startColumn)
+        {
+            Line = line + 1;
+            StartColumn = startColumn + 1;
         }
 
         /// <summary>
