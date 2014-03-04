@@ -20,9 +20,8 @@ namespace MiniPL.FrontEnd
         /// </summary>
         /// <param name="line">Current line of the source code.</param>
         /// <param name="startColumn">Starting column of the lexeme.</param>
-        /// <param name="value">Integer value.</param>
-        public TokenTerminal(int line, int startColumn, T value)
-            : base(line, startColumn, value.ToString().ToLower())
+        /// <param name="value">Value, must be int, string or bool</param>
+        public TokenTerminal(int line, int startColumn, T value) : base(line, startColumn)
         {
             if (typeof(T) != typeof(int) &&
                 typeof(T) != typeof(bool) &&
@@ -31,6 +30,8 @@ namespace MiniPL.FrontEnd
                 throw new TokenException("Value must be int, bool, or string");
             }
             Value = value;
+            Lexeme = typeof(T) == typeof(bool) ? value.ToString().ToLower() : value.ToString(); // boolean value's string representation is "True" or "False"
+                                                                                                // and we don't want to mess string values
         }
     }
 }

@@ -21,7 +21,7 @@
         /// <summary>
         /// Lexeme
         /// </summary>
-        public string Lexeme { get; private set; }
+        public string Lexeme { get; protected set; }
 
 
         /// <summary>

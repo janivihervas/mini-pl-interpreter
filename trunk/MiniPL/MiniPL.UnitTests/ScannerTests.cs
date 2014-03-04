@@ -247,63 +247,78 @@ namespace MiniPL.UnitTests
                               ));
         }
 
-        
+
         [Test]
-        public void TestScannerCanTokenizeTerminals()
+        public void TestTokenTerminalBool()
         {
-            var lines = new List<string>
-                            {
-                                "var x : int := 4;",
-                                "var y : bool := !true & false;",
-                                "var z : string := \"test\";" // TODO: write more comprehensive tests for string parsing
-                            };
+            var s = "var x : bool := true;";
+            var tokens = _scanner.Tokenize(new List<string> { s });
+            var token = (TokenTerminal<bool>)tokens.Find(x => x is TokenTerminal<bool>);
 
-            var tokens = _scanner.Tokenize(lines);
-            Assert.IsTrue(4 <= tokens.Count);
-            var pass = false;
+            Assert.IsTrue(token.Value);
+            Assert.AreEqual("true", token.Lexeme);
 
-            foreach (var token in tokens.Where(token => token.Lexeme == "4"))
+            s = "var x : bool := false;";
+            tokens = _scanner.Tokenize(new List<string> { s });
+            token = (TokenTerminal<bool>)tokens.Find(x => x is TokenTerminal<bool>);
+
+            Assert.IsFalse(token.Value);
+            Assert.AreEqual("false", token.Lexeme);
+        }
+
+        [Test]
+        public void TestTokenTerminalInt()
+        {
+            var s = "var x : int := 153;";
+            var tokens = _scanner.Tokenize(new List<string> { s });
+            var token = (TokenTerminal<int>)tokens.Find(x => x is TokenTerminal<int>);
+
+            Assert.AreEqual(153, token.Value);
+            Assert.AreEqual("153", token.Lexeme);
+
+            s = "var x : int := -1133;";
+            tokens = _scanner.Tokenize(new List<string> { s });
+            token = null;
+            Token previousToken = null;
+            for (var i = 0; i < tokens.Count; i++)
             {
-                Assert.AreEqual(4, ((TokenTerminal<int>) token).Value);
-                Assert.AreEqual(1, token.Line);
-                Assert.AreEqual(16, token.StartColumn);
-                pass = true;
+                if (tokens[i] is TokenTerminal<int>)
+                {
+                    token = (TokenTerminal<int>) tokens[i];
+                    previousToken = tokens[i - 1];
+                }
             }
 
-            Assert.IsTrue(pass);
-            pass = false;
+            Assert.IsNotNull(token);
+            Assert.IsNotNull(previousToken);
 
-            foreach ( var token in tokens.Where(token => token.Lexeme == "true") )
+            Assert.AreEqual(1133, token.Value);
+            Assert.AreEqual("1133", token.Lexeme);
+
+            Assert.AreEqual(Operator.Minus, previousToken.Lexeme);
+        }
+
+        [Test]
+        public void TestTokenTerminalString()
+        {
+            var s = "var x : string := \"test\";";
+            var tokens = _scanner.Tokenize(new List<string> { s });
+
+            TokenTerminal<string> token = null;
+            Token nextToken = null;
+
+            for ( var i = 0; i < tokens.Count; i++ )
             {
-                Assert.AreEqual(true, ((TokenTerminal<bool>)token).Value);
-                Assert.AreEqual(2, token.Line);
-                Assert.AreEqual(18, token.StartColumn);
-                pass = true;
+                if ( tokens[i] is TokenTerminal<string> )
+                {
+                    token = (TokenTerminal<string>)tokens[i];
+                    nextToken = tokens[i + 1];
+                }
             }
 
-            Assert.IsTrue(pass);
-            pass = false;
-
-            foreach ( var token in tokens.Where(token => token.Lexeme == "false") )
-            {
-                Assert.AreEqual(false, ((TokenTerminal<bool>)token).Value);
-                Assert.AreEqual(2, token.Line);
-                Assert.AreEqual(25, token.StartColumn);
-                pass = true;
-            }
-
-            Assert.IsTrue(pass);
-            pass = false;
-
-            foreach ( var token in tokens.Where(token => token.Lexeme == "test") )
-            {
-                Assert.AreEqual("test", ((TokenTerminal<string>)token).Value);
-                Assert.AreEqual(3, token.Line);
-                Assert.AreEqual(19, token.StartColumn); // '\' doesn't count
-                pass = true;
-            }
-
-            Assert.IsTrue(pass);
+            Assert.AreEqual("test", token.Value);
+            Assert.AreEqual("test", token.Lexeme);
+            Assert.AreEqual(";", nextToken.Lexeme);
         }
     }
 }

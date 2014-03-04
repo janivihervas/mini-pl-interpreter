@@ -180,15 +180,23 @@ namespace MiniPL.FrontEnd
             if ( Char.IsNumber(line[_column]) ) // int
             {
                 var lenght = 1;
-                while (_column + lenght < line.Length && Char.IsNumber(line[_column + lenght]))
+                while ( _column + lenght < line.Length && Char.IsNumber(line[_column + lenght]) )
                 {
                     lenght++;
                 }
                 var subString = line.Substring(_column, lenght);
-                var value = int.Parse(subString);
-                var token = new TokenTerminal<int>(_row, _column, value);
-                _column += lenght;
-                return token;
+                try
+                {
+                    var value = int.Parse(subString);
+                    var token = new TokenTerminal<int>(_row, _column, value);
+                    _column += lenght;
+                    return token;
+                }
+                catch (FormatException)
+                {
+                    // TODO: Error handling
+                    return null;
+                }
             }
             if (line[_column] == 't' || line[_column] == 'f') // boolean
             {
@@ -198,10 +206,18 @@ namespace MiniPL.FrontEnd
                     lenght++;
                 }
                 var subString = line.Substring(_column, lenght);
-                var value = Boolean.Parse(subString);
-                var token = new TokenTerminal<bool>(_row, _column, value);
-                _column += subString.Length;
-                return token;
+                try
+                {
+                    var value = Boolean.Parse(subString);
+                    var token = new TokenTerminal<bool>(_row, _column, value);
+                    _column += subString.Length;
+                    return token;
+                }
+                catch ( FormatException )
+                {
+                    // TODO: Error handling
+                    return null;
+                }
             }
             return null;
         }
