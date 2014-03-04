@@ -1,4 +1,6 @@
-﻿namespace MiniPL.FrontEnd
+﻿using System.Collections.Generic;
+
+namespace MiniPL.FrontEnd
 {
     /// @author Jani Viherväs
     /// @version 28.2.2014
@@ -61,7 +63,7 @@
 
         #endregion
 
-        #region Boolean
+        #region Logical
 
         /// <summary>
         /// Logical and operator
@@ -85,5 +87,21 @@
         /// </summary>
         public const string ParenthesisRight = ")";
 
+
+        /// <summary>
+        /// Returns all the operators in an order that doesn't mess up the longest matching rule, i.e. ">=" is before ">".
+        /// </summary>
+        /// <returns>All the operators</returns>
+        public static IEnumerable<string> Operators()
+        {
+            return new[]
+                       {
+                           Plus, Minus, Multiply, Divide,
+                           ParenthesisLeft, ParenthesisRight,
+                           And, Not,
+                           GreaterOrEqualThan, LesserOrEqualThan,
+                           GreaterThan, LesserThan, Equal
+                       };
+        }
     }
 }

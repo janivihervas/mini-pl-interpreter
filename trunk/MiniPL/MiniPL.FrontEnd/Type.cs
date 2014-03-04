@@ -1,4 +1,6 @@
-﻿namespace MiniPL.FrontEnd
+﻿using System.Collections.Generic;
+
+namespace MiniPL.FrontEnd
 {
     /// @author Jani Viherväs
     /// @version 28.2.2014
@@ -22,5 +24,14 @@
         /// String type
         /// </summary>
         public const string String = "string";
+
+        /// <summary>
+        /// Returns all the types in an order from shortest length to longest.
+        /// </summary>
+        /// <returns>All the types</returns>
+        public static IEnumerable<string> Types()
+        {
+            return new[] {Int, Bool, String};
+        }
     }
 }

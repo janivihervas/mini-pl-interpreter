@@ -120,18 +120,7 @@ namespace MiniPL.FrontEnd
         /// <returns>New token for reserved keywords or null</returns>
         private Token CreateReservedKeywordToken(string line)
         {
-            return CreateToken(line, new[] { ReservedKeyword.Assignment, 
-                                                  ReservedKeyword.Colon, 
-                                                  ReservedKeyword.Semicolon, 
-                                                  ReservedKeyword.Range, 
-                                                  ReservedKeyword.Do, 
-                                                  ReservedKeyword.In, 
-                                                  ReservedKeyword.End, 
-                                                  ReservedKeyword.For, 
-                                                  ReservedKeyword.Var, 
-                                                  ReservedKeyword.Read, 
-                                                  ReservedKeyword.Print, 
-                                                  ReservedKeyword.Assert });
+            return CreateToken(line, ReservedKeyword.ReservedKeywords());
         }
 
         
@@ -142,7 +131,7 @@ namespace MiniPL.FrontEnd
         /// <returns>New token for variable types or null, if it wasn't a type token</returns>
         private Token CreateTypeToken(string line)
         {
-            return CreateToken(line, new[] {Type.Int, Type.Bool, Type.String});
+            return CreateToken(line, Type.Types());
         }
 
         
@@ -153,11 +142,7 @@ namespace MiniPL.FrontEnd
         /// <returns>New token for operators or null, if it wasn't an operator token</returns>
         private Token CreateOperatorToken(string line)
         {
-            return CreateToken(line, new[] { Operator.Plus, Operator.Minus, Operator.Multiply, Operator.Divide,
-                                                  Operator.ParenthesisLeft, Operator.ParenthesisRight,
-                                                  Operator.And, Operator.Not,
-                                                  Operator.GreaterOrEqualThan, Operator.LesserOrEqualThan, 
-                                                  Operator.GreaterThan, Operator.LesserThan, Operator.Equal });
+            return CreateToken(line, Operator.Operators());
         }
 
 

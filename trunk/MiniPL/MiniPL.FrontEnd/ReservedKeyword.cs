@@ -1,4 +1,6 @@
-﻿namespace MiniPL.FrontEnd
+﻿using System.Collections.Generic;
+
+namespace MiniPL.FrontEnd
 {
     /// @author Jani Viherväs
     /// @version 28.2.2014
@@ -69,5 +71,29 @@
         /// </summary>
         public const string Semicolon = ";";
 
+
+        /// <summary>
+        /// Returns all the reserved keywords in an order that doesn't mess up the longest matching rule, i.e. ":=" is before ":". 
+        /// They are also ordered from shortest length to longest.
+        /// </summary>
+        /// <returns>All the reserved keywords</returns>
+        public static IEnumerable<string> ReservedKeywords()
+        {
+            return new[]
+                       {
+                           Assignment,
+                           Colon,
+                           Semicolon,
+                           Range,
+                           Do,
+                           In,
+                           End,
+                           For,
+                           Var,
+                           Read,
+                           Print,
+                           Assert
+                       };
+        }
     }
 }
