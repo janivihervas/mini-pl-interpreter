@@ -1,7 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using IOException = MiniPL.Exceptions.IOException;
 
-namespace MiniPL.IO
+namespace HelperFunctions
 {
     /// @author Jani Viherväs
     /// @version 27.2.2014
@@ -37,7 +38,7 @@ namespace MiniPL.IO
         {
             if (!fileName.Contains(FileExtension))
             {
-                throw new Exceptions.IOException(
+                throw new IOException(
                     "File is not of the correct extension. Required file extension is " + FileExtension);
             }
             var path = fileName;
@@ -48,7 +49,7 @@ namespace MiniPL.IO
             }
             if (!File.Exists(path))
             {
-                throw new Exceptions.IOException("File \"" + path + "\" does not exist.");
+                throw new IOException("File \"" + path + "\" does not exist.");
             }
             var file = new StreamReader(path);
             var result = new List<string>();

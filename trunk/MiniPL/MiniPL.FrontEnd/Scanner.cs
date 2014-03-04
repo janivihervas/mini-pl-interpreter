@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+using HelperFunctions;
 
 namespace MiniPL.FrontEnd
 {
@@ -131,7 +131,7 @@ namespace MiniPL.FrontEnd
                                                   ReservedKeyword.Var, 
                                                   ReservedKeyword.Read, 
                                                   ReservedKeyword.Print, 
-                                                  ReservedKeyword.Assert,  });
+                                                  ReservedKeyword.Assert });
         }
 
         
@@ -170,11 +170,9 @@ namespace MiniPL.FrontEnd
         {
             if ( line[_column] == '"' ) // string
             {
-                var end = line.Substring(_column);
-                var value = ScanString(end); // TODO: Remember that this gets the contents without the "-characters
+                var value = StringParse.ScanString(line, _column); // TODO: Remember that this gets the contents without the "-characters
                 var token = new TokenTerminal<string>(_row, _column, value);
-                //_column += value.Length;
-                SkipString(line);
+                _column = StringParse.SkipString(line, _column);
                 return token;
             }
             if ( Char.IsNumber(line[_column]) ) // int
@@ -221,78 +219,5 @@ namespace MiniPL.FrontEnd
             }
             return null;
         }
-
-        
-        /// <summary>
-        /// Moves the index so that it skips the string
-        /// </summary>
-        private void SkipString(string line)
-        {
-            if (line[_column] != '"')
-            {
-                return;
-            }
-            _column++;
-            for (var i = _column; i < line.Length; i++)
-            {
-                if (line[i] == '"')
-                {
-                    _column++;
-                    break;
-                }
-                if (line[i] == '\\')
-                {
-                    _column++;
-                    i++;
-                }
-                _column++;
-            }
-        }
-
-
-        /// <summary>
-        /// Scans the string literal
-        /// </summary>
-        /// <param name="input">Input</param>
-        /// <returns>"te\"st" => te"st</returns>
-        public static string ScanString(string input)
-        {
-            var s = input.ToCharArray();
-            if ( s.Length < 2 )
-            {
-                return "";
-            }
-            if ( s[0] != '"' )
-            {
-                return "";
-            }
-
-            var result = new StringBuilder();
-
-            for ( var i = 1; i < s.Length; i++ )
-            {
-                if ( s[i] == '"' ) // End of the string, i.e. string s = "test";
-                {
-                    break;
-                }
-
-                if ( i == s.Length - 1 && s[i] != '"' ) // We are at the last character 
-                {                                       // and have not stumbled upon closing quotes
-                    return "";                          // f.g. string s = "test
-                }
-
-                if ( s[i] == '\\' && i < s.Length - 1 ) // Escape character, i.e. string s = "te\"st"  ==> te"st
-                {
-                    if (s[i+1] != 'n' ||
-                        s[i+1] != 'r' ||
-                        s[i+1] != 't')
-                    i++;
-                }
-
-                result.Append(s[i]);
-            }
-            return result.ToString();
-        }
-
     }
 }
