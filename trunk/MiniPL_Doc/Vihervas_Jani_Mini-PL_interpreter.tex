@@ -1,0 +1,85 @@
+\documentclass[a4paper,12pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[english]{babel}
+\usepackage[charter]{mathdesign}
+\usepackage{beton}
+\renewcommand{\bfdefault}{bx}
+\renewcommand{\scdefault}{sc}
+\usepackage{textcomp}
+\usepackage{hyperref}
+\usepackage{enumerate}
+\usepackage{amsmath}
+\usepackage[all]{xy}
+\usepackage[left=1.5cm,right=1.5cm,top=1.5cm,bottom=1.5cm]{geometry}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{1em}
+
+\author{Jani Viherväs}
+\hypersetup{pdfinfo={
+Title={Mini-PL Interpreter},
+Author={Jani Viherväs},
+Subject={Compilers},
+Keywords={compilers, Mini-PL, interpreter}
+}}
+
+
+\newcommand{\ii}[1]{\textit{#1}}
+\newcommand{\bb}[1]{\textbf{#1}}
+\newcommand{\ttt}[1]{\texttt{#1}}
+\newcommand{\e}{\epsilon}
+
+
+\begin{document}
+
+\begin{flushright}
+\today \\
+\vspace{1em}
+Jani Viherväs\\ 
+\href{mailto:jani.vihervas@cs.helsinki.fi}{jani.vihervas@cs.helsinki.fi}
+\end{flushright}
+
+\vfill
+
+\begin{center}
+\textsc{\LARGE Mini-PL Interpreter} \\
+\vspace{1em}
+\textsc{\large 58144 Compilers Project}
+\end{center}
+
+\vfill
+
+Grammar
+\begin{align*}
+<prog> &\to <stmts> \\
+<stmts> &\to <stmt> \bb{ ; } <stmts'> \\
+<stmts'> &\to \e \mid <stmts> \\
+<stmt> &\to \bb{var } <ident'> \bb{ : } <type> <stmt'> \\ 
+       &\mid <ident> \bb{ := } <expr> \\  
+       &\mid \bb{for } <ident> \bb{ in } <expr> \bb{ .. } <expr> \bb{ do } 
+             <stmts> \bb{ end } \bb{for} \\
+       &\mid \bb{read } <ident> \\
+       &\mid \bb{print } <expr> \\
+       &\mid \bb{assert (}  <expr> \bb{ )} \\
+<stmt'> &\to \e \mid \bb{:= } <expr> \\
+<expr> &\to <opnd> <op> <opnd> \\
+       &\mid <expr'> <opnd> \\
+<expr'> &\to \e \mid <unary> \\
+<opnd> &\to <int> \\
+       &\mid <string> \\
+       &\mid <ident> \\
+       &\mid \bb{( } <expr> \bb{ )} \\
+<type> &\to \bb{int} \mid \bb{string} \mid \bb{bool} \\
+<reserved\ttt{ } keyword> &\to 
+              \bb{var} \mid \bb{for} \mid \bb{end} \mid \bb{in} \mid \bb{do} \mid \bb{read} \mid 
+              \bb{print} \mid \bb{int} \mid \bb{string} \mid \bb{bool} \mid
+              \bb{assert} \\
+<unary> &\to \bb{!} \\
+<op> &\to \bb{+} \mid \bb{-} \mid \bb{*} \mid \bb{/} \mid \bb{<} \mid
+\bb{>} \mid \bb{<=} \mid \bb{>=} \mid \bb{=} \mid \bb{\&}
+\end{align*}
+
+$<ident'>$ adds identifier to symbol table, where as $<ident>$ looks the
+identifier from the symbol table. Operators $>$, $<=$ and $>=$ are added,
+because they are very easy to implement.
+\end{document}

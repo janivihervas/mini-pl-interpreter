@@ -1,0 +1,14 @@
+#TeXlipse project settings
+#Wed Mar 05 16:02:45 EET 2014
+markTmpDer=true
+builderNum=2
+outputDir=
+makeIndSty=
+bibrefDir=
+outputFormat=pdf
+tempDir=tmp
+mainTexFile=Vihervas_Jani_Mini-PL_interpreter.tex
+outputFile=Vihervas_Jani_Mini-PL_interpreter.pdf
+langSpell=en
+markDer=true
+srcDir=
