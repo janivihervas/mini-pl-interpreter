@@ -42,7 +42,7 @@ namespace MiniPL.Interpreter
             var fileReader = new FileReader(FileExtension);
             try
             {
-                var lines = fileReader.ReadFile(args[0], EndOfFileMark);
+                var lines = fileReader.ReadFile(args[0]);
                 var scanner = new Scanner();
                 var tokens = scanner.Tokenize(lines);
 

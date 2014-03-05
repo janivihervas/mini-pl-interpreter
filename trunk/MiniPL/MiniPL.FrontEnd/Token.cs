@@ -29,12 +29,12 @@
         /// </summary>
         /// <param name="line">Current line of the source code.</param>
         /// <param name="startColumn">Starting column of the lexeme.</param>
-        /// <param name="lexeme">Lexeme.</param>
-        public Token(int line, int startColumn, string lexeme)
+        /// <param name="identifier">Lexeme.</param>
+        public Token(int line, int startColumn, string identifier)
         {
             Line = line + 1;
             StartColumn = startColumn + 1;
-            Lexeme = lexeme;
+            Lexeme = identifier;
         }
 
 

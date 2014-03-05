@@ -30,7 +30,12 @@ namespace MiniPL.FrontEnd
                 var line = lines[_row];
                 while (_column < line.Length)
                 {
-                    SkipWhiteSpace(line);
+                    var stop = SkipWhiteSpace(line);
+                    // TODO: skip comments
+                    if (stop)
+                    {
+                        break;
+                    }
                     Token token;
 
                     if ( (token = CreateTypeToken(line)) != null )
@@ -54,7 +59,12 @@ namespace MiniPL.FrontEnd
                     {
                         tokens.Add(token);
                         continue;
-                    } 
+                    }
+                    if ( (token = CreateIdentifierToken(line)) != null )
+                    {
+                        tokens.Add(token);
+                        continue;
+                    }
                     _column++; // TODO: Remove this when fully implemented
                 }
             }
@@ -67,12 +77,18 @@ namespace MiniPL.FrontEnd
         /// Skips whitespaces in the current line
         /// </summary>
         /// <param name="line"></param>
-        private void SkipWhiteSpace(string line)
+        /// <returns>Boolean whether to stop scanning</returns>
+        private bool SkipWhiteSpace(string line)
         {
-            while (Char.IsWhiteSpace(line[_column]))
+            while (_column < line.Length && Char.IsWhiteSpace(line[_column]))
             {
                 _column++;
+                if (_column == line.Length)
+                {
+                    return true;
+                }
             }
+            return false;
         }
 
 
@@ -204,5 +220,30 @@ namespace MiniPL.FrontEnd
             }
             return null;
         }
+
+
+        /// <summary>
+        /// Creates a new token for identifiers
+        /// </summary>
+        /// <param name="line">Current line</param>
+        /// <returns>New token for identifier or null</returns>
+        private TokenIdentifier CreateIdentifierToken(string line)
+        {
+            if (!Char.IsLetter(line[_column])) // identifier must begin with a character
+            {
+                return null;
+            }
+
+            var lenght = 1;
+            while ( Char.IsLetterOrDigit(line[_column + lenght]) || line[_column + lenght] == '_')
+            {
+                lenght++;
+            }
+            var subString = line.Substring(_column, lenght);
+            var token = new TokenIdentifier(_row, _column, subString);
+            _column += subString.Length;
+            return token;
+        }
+
     }
 }

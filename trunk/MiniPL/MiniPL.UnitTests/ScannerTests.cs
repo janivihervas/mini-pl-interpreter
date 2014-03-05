@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using MiniPL.FrontEnd;
 using NUnit.Framework;
 
@@ -249,6 +248,59 @@ namespace MiniPL.UnitTests
 
 
         [Test]
+        public void TestCanTokenizeVariableIdentifiers()
+        {
+            var lines = new List<string>
+                            {
+                                "var x : int := 3;",
+                                "var y2k : bool := true;",
+                                "var CONSTANT_TEST : string := \"test\";",
+                                "assert(x > 2);",
+                                "assert(y2k != false);",
+                                "assert(CONSTANT_TEST = \"test\");"
+                            };
+
+            var tokens = _scanner.Tokenize(lines);
+            Assert.IsTrue(6 <= tokens.Count);
+
+            Assert.IsTrue(tokens.Exists(x =>
+                                        x.Lexeme == "x" &&
+                                        x.Line == 1 &&
+                                        x.StartColumn == 5
+                              ));
+
+            Assert.IsTrue(tokens.Exists(x =>
+                                        x.Lexeme == "x" &&
+                                        x.Line == 4 &&
+                                        x.StartColumn == 8
+                              ));
+
+            Assert.IsTrue(tokens.Exists(x =>
+                            x.Lexeme == "y2k" &&
+                            x.Line == 2 &&
+                            x.StartColumn == 5
+                  ));
+
+            Assert.IsTrue(tokens.Exists(x =>
+                                        x.Lexeme == "y2k" &&
+                                        x.Line == 5 &&
+                                        x.StartColumn == 8
+                              ));
+
+            Assert.IsTrue(tokens.Exists(x =>
+                            x.Lexeme == "CONSTANT_TEST" &&
+                            x.Line == 3 &&
+                            x.StartColumn == 5
+                  ));
+
+            Assert.IsTrue(tokens.Exists(x =>
+                                        x.Lexeme == "CONSTANT_TEST" &&
+                                        x.Line == 6 &&
+                                        x.StartColumn == 8
+                              ));
+        }
+
+        [Test]
         public void TestTokenTerminalBool()
         {
             var s = "var x : bool := true;";
@@ -301,7 +353,7 @@ namespace MiniPL.UnitTests
         [Test]
         public void TestTokenTerminalString()
         {
-            var s = "var x : string := \"test\";";
+            const string s = "var x : string := \"test\";";
             var tokens = _scanner.Tokenize(new List<string> { s });
 
             TokenTerminal<string> token = null;
@@ -316,9 +368,239 @@ namespace MiniPL.UnitTests
                 }
             }
 
+            Assert.IsNotNull(token);
+            Assert.IsNotNull(nextToken);
+
             Assert.AreEqual("test", token.Value);
             Assert.AreEqual("test", token.Lexeme);
             Assert.AreEqual(";", nextToken.Lexeme);
+        }
+
+        [Test]
+        public void CanTokenizeCorrectSourceCode()
+        {
+            var lines = new List<string>
+                            {
+                                "var nTimes : int := 0;",
+                                "var s : string := \"How many times?\";",
+                                "print s;", 
+                                "read nTimes;", 
+                                "var x : int;",
+                                "for x in 0..nTimes-1 do ",
+                                "    print x;",
+                                "    print \" : Hello, World!\\n\";",
+                                "end for;",
+                                "var b : bool := x = nTimes;",
+                                "assert (b);"
+                            };
+
+            var tokens = _scanner.Tokenize(lines);
+            Assert.IsTrue(57 == tokens.Count);
+            var i = 0;
+
+            var token = tokens[i++];
+            Assert.AreEqual(ReservedKeyword.Var, token.Lexeme); Assert.AreEqual(1, token.Line); Assert.AreEqual(1, token.StartColumn); 
+
+            token = tokens[i++];
+            Assert.AreEqual("nTimes", token.Lexeme);             
+            Assert.IsTrue(token is TokenIdentifier);
+            Assert.AreEqual("nTimes", ((TokenIdentifier)token).Identifier);
+
+            token = tokens[i++];
+            Assert.AreEqual(ReservedKeyword.Colon, token.Lexeme);              
+            token = tokens[i++];
+            Assert.AreEqual(Type.Int, token.Lexeme);
+            
+            token = tokens[i++];
+            Assert.AreEqual(ReservedKeyword.Assignment, token.Lexeme);  
+            
+            token = tokens[i++];
+            Assert.AreEqual("0", token.Lexeme);  
+            Assert.IsTrue(token is TokenTerminal<int>);
+            Assert.AreEqual(0, ((TokenTerminal<int>)token).Value);
+
+            token = tokens[i++];
+            Assert.AreEqual(ReservedKeyword.Semicolon, token.Lexeme);  
+            
+            token = tokens[i++];
+            Assert.AreEqual(ReservedKeyword.Var, token.Lexeme);  
+            
+            token = tokens[i++];
+            Assert.AreEqual("s", token.Lexeme);  
+            Assert.IsTrue(token is TokenIdentifier);
+            Assert.AreEqual("s", ((TokenIdentifier)token).Identifier);
+
+            token = tokens[i++];
+            Assert.AreEqual(ReservedKeyword.Colon, token.Lexeme);  
+            
+            token = tokens[i++];
+            Assert.AreEqual(Type.String, token.Lexeme);  
+            
+            token = tokens[i++];
+            Assert.AreEqual(ReservedKeyword.Assignment, token.Lexeme);  
+            
+            token = tokens[i++];
+            Assert.AreEqual("How many times?", token.Lexeme);  
+            
+            token = tokens[i++];
+            Assert.AreEqual(ReservedKeyword.Semicolon, token.Lexeme);  
+            
+            token = tokens[i++];
+            Assert.AreEqual(ReservedKeyword.Print, token.Lexeme);  
+            
+            token = tokens[i++];
+            Assert.AreEqual("s", token.Lexeme);  
+            Assert.IsTrue(token is TokenIdentifier);
+            Assert.AreEqual("s", ((TokenIdentifier)token).Identifier);
+
+            token = tokens[i++];
+            Assert.AreEqual(ReservedKeyword.Semicolon, token.Lexeme);  
+            
+            token = tokens[i++];
+            Assert.AreEqual(ReservedKeyword.Read, token.Lexeme);  
+            
+            token = tokens[i++]; 
+            Assert.AreEqual("nTimes", token.Lexeme);  
+            Assert.IsTrue(token is TokenIdentifier);
+            Assert.AreEqual("nTimes", ((TokenIdentifier)token).Identifier);
+
+            token = tokens[i++];
+            Assert.AreEqual(ReservedKeyword.Semicolon, token.Lexeme);  
+            
+            token = tokens[i++];
+            Assert.AreEqual(ReservedKeyword.Var, token.Lexeme);  
+            
+            token = tokens[i++];
+            Assert.AreEqual("x", token.Lexeme);  
+            Assert.IsTrue(token is TokenIdentifier);
+            Assert.AreEqual("x", ((TokenIdentifier)token).Identifier);
+
+            token = tokens[i++];
+            Assert.AreEqual(ReservedKeyword.Colon, token.Lexeme);  
+            
+            token = tokens[i++];
+            Assert.AreEqual(Type.Int, token.Lexeme);  
+            
+            token = tokens[i++];
+            Assert.AreEqual(ReservedKeyword.Semicolon, token.Lexeme);  
+            
+            token = tokens[i++];
+            Assert.AreEqual(ReservedKeyword.For, token.Lexeme);  
+            
+            token = tokens[i++];
+            Assert.AreEqual("x", token.Lexeme);  
+            Assert.IsTrue(token is TokenIdentifier);
+            Assert.AreEqual("x", ((TokenIdentifier)token).Identifier);
+
+            token = tokens[i++];
+            Assert.AreEqual(ReservedKeyword.In, token.Lexeme);  
+            
+            token = tokens[i++];
+            Assert.AreEqual("0", token.Lexeme);  
+            Assert.IsTrue(token is TokenTerminal<int>);
+            Assert.AreEqual(0, ((TokenTerminal<int>)token).Value);
+
+            token = tokens[i++];
+            Assert.AreEqual(ReservedKeyword.Range, token.Lexeme);  
+            
+            token = tokens[i++];
+            Assert.AreEqual("nTimes", token.Lexeme);  
+            Assert.IsTrue(token is TokenIdentifier);
+            Assert.AreEqual("nTimes", ((TokenIdentifier)token).Identifier);
+
+            token = tokens[i++];
+            Assert.AreEqual(Operator.Minus, token.Lexeme);  
+            
+            token = tokens[i++];
+            Assert.AreEqual("1", token.Lexeme);  
+            Assert.IsTrue(token is TokenTerminal<int>);
+            Assert.AreEqual(1, ((TokenTerminal<int>)token).Value);
+
+            token = tokens[i++];
+            Assert.AreEqual(ReservedKeyword.Do, token.Lexeme);  
+            
+            token = tokens[i++];
+            Assert.AreEqual(ReservedKeyword.Print, token.Lexeme);  
+            
+            token = tokens[i++];
+            Assert.AreEqual("x", token.Lexeme);  
+            Assert.IsTrue(token is TokenIdentifier);
+            Assert.AreEqual("x", ((TokenIdentifier)token).Identifier);
+
+            token = tokens[i++];
+            Assert.AreEqual(ReservedKeyword.Semicolon, token.Lexeme);  
+            
+            token = tokens[i++];
+            Assert.AreEqual(ReservedKeyword.Print, token.Lexeme);  
+            
+            token = tokens[i++];
+            Assert.AreEqual(" : Hello, World!\\n", token.Lexeme);  
+            Assert.IsTrue(token is TokenTerminal<string>);
+            Assert.AreEqual(" : Hello, World!\\n", ((TokenTerminal<string>)token).Value);
+
+            token = tokens[i++];
+            Assert.AreEqual(ReservedKeyword.Semicolon, token.Lexeme);  
+            
+            token = tokens[i++];
+            Assert.AreEqual(ReservedKeyword.End, token.Lexeme);  
+            
+            token = tokens[i++];
+            Assert.AreEqual(ReservedKeyword.For, token.Lexeme);  
+            
+            token = tokens[i++];
+            Assert.AreEqual(ReservedKeyword.Semicolon, token.Lexeme);  
+            
+            token = tokens[i++];
+            Assert.AreEqual(ReservedKeyword.Var, token.Lexeme);  
+            
+            token = tokens[i++];
+            Assert.AreEqual("b", token.Lexeme);  
+            Assert.IsTrue(token is TokenIdentifier);
+            Assert.AreEqual("b", ((TokenIdentifier)token).Identifier);
+
+            token = tokens[i++];
+            Assert.AreEqual(ReservedKeyword.Colon, token.Lexeme);  
+            
+            token = tokens[i++];
+            Assert.AreEqual(Type.Bool, token.Lexeme);  
+            
+            token = tokens[i++];
+            Assert.AreEqual(ReservedKeyword.Assignment, token.Lexeme);  
+            
+            token = tokens[i++];
+            Assert.AreEqual("x", token.Lexeme);  
+            Assert.IsTrue(token is TokenIdentifier);
+            Assert.AreEqual("x", ((TokenIdentifier)token).Identifier);
+
+            token = tokens[i++];
+            Assert.AreEqual(Operator.Equal, token.Lexeme);  
+            
+            token = tokens[i++];
+            Assert.AreEqual("nTimes", token.Lexeme);  
+            Assert.IsTrue(token is TokenIdentifier);
+            Assert.AreEqual("nTimes", ((TokenIdentifier)token).Identifier);
+
+            token = tokens[i++];
+            Assert.AreEqual(ReservedKeyword.Semicolon, token.Lexeme);  
+            
+            token = tokens[i++];
+            Assert.AreEqual(ReservedKeyword.Assert, token.Lexeme);  
+            
+            token = tokens[i++];
+            Assert.AreEqual(Operator.ParenthesisLeft, token.Lexeme);  
+            
+            token = tokens[i++];
+            Assert.AreEqual("b", token.Lexeme);  
+            Assert.IsTrue(token is TokenIdentifier);
+            Assert.AreEqual("b", ((TokenIdentifier)token).Identifier);
+
+            token = tokens[i++];
+            Assert.AreEqual(Operator.ParenthesisRight, token.Lexeme);  
+            
+            token = tokens[i++];
+            Assert.AreEqual(ReservedKeyword.Semicolon, token.Lexeme);  
+
+            Assert.AreEqual(tokens.Count, i);
         }
     }
 }

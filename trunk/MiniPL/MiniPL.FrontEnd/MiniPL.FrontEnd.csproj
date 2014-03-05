@@ -45,6 +45,7 @@
     <Compile Include="ReservedKeyword.cs" />
     <Compile Include="Scanner.cs" />
     <Compile Include="Token.cs" />
+    <Compile Include="TokenIdentifier.cs" />
     <Compile Include="TokenTerminal.cs" />
     <Compile Include="Type.cs" />
   </ItemGroup>

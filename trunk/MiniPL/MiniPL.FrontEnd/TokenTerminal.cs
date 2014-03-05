@@ -6,17 +6,17 @@ namespace MiniPL.FrontEnd
     /// @version 28.2.2014
     ///
     /// <summary>
-    /// Integer token class.
+    /// Terminal token class.
     /// </summary>
     public class TokenTerminal<T> : Token
     {
         /// <summary>
-        /// Gets the integer value
+        /// Gets the token value
         /// </summary>
         public T Value { get; private set; }
 
         /// <summary>
-        /// Creates a new integer token. ATTENTION! This constructor handles the 0th column and row, DON'T add one to neither one.
+        /// Creates a new terminal token. ATTENTION! This constructor handles the 0th column and row, DON'T add one to neither one.
         /// </summary>
         /// <param name="line">Current line of the source code.</param>
         /// <param name="startColumn">Starting column of the lexeme.</param>
