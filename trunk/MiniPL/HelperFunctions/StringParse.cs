@@ -77,7 +77,8 @@ namespace HelperFunctions
                 {
                     if ( s[i + 1] != 'n' &&
                         s[i + 1] != 'r' &&
-                        s[i + 1] != 't' )
+                        s[i + 1] != 't' &&
+                        s[i + 1] != '\\' )
                         i++;
                 }
 

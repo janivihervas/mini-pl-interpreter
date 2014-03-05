@@ -29,6 +29,7 @@ namespace MiniPL.UnitTests
             Assert.AreEqual("line break \\n", StringParse.ScanString("\"line break \\n\""));            // line break \n => line break \n
             Assert.AreEqual("tab \\t tab", StringParse.ScanString("\"tab \\t tab\""));                  // tab \t tab => tab \t tab
             Assert.AreEqual("carriage \\r return", StringParse.ScanString("\"carriage \\r return\""));  // carriage \r return => carriage \r return
+            Assert.AreEqual("\\backslash", StringParse.ScanString("\"\\\\backslash\""));                // \\backslash => \backslash
         }
 
         [Test]
