@@ -668,6 +668,76 @@ namespace MiniPL.UnitTests
             Assert.AreEqual(ReservedKeyword.Semicolon, token.Lexeme);
             Assert.AreEqual(3, token.Line);
 
+            Assert.AreEqual(i, tokens.Count);
+        }
+
+
+        [Test]
+        public void CanSkipMultiLineComments()
+        {
+            var lines = new List<string>
+                            {
+                                "var i : int; /* := 0;",
+                                "//var s : string := \"How many times?\";*/",
+                                "var b : bool := true;", 
+                            };
+
+            var tokens = _scanner.Tokenize(lines);
+            Assert.AreEqual(12, tokens.Count);
+            var i = 0;
+
+            var token = tokens[i++];
+            Assert.AreEqual(ReservedKeyword.Var, token.Lexeme);
+            Assert.AreEqual(1, token.Line);
+
+            token = tokens[i++];
+            Assert.AreEqual("i", token.Lexeme);
+            Assert.AreEqual("i", ((TokenIdentifier)token).Identifier);
+            Assert.AreEqual(1, token.Line);
+
+            token = tokens[i++];
+            Assert.AreEqual(ReservedKeyword.Colon, token.Lexeme);
+            Assert.AreEqual(1, token.Line);
+
+            token = tokens[i++];
+            Assert.AreEqual(Type.Int, token.Lexeme);
+            Assert.AreEqual(1, token.Line);
+
+            token = tokens[i++];
+            Assert.AreEqual(ReservedKeyword.Semicolon, token.Lexeme);
+            Assert.AreEqual(1, token.Line);
+
+            token = tokens[i++];
+            Assert.AreEqual(ReservedKeyword.Var, token.Lexeme);
+            Assert.AreEqual(3, token.Line);
+
+            token = tokens[i++];
+            Assert.AreEqual("b", token.Lexeme);
+            Assert.AreEqual("b", ((TokenIdentifier)token).Identifier);
+            Assert.AreEqual(3, token.Line);
+
+            token = tokens[i++];
+            Assert.AreEqual(ReservedKeyword.Colon, token.Lexeme);
+            Assert.AreEqual(3, token.Line);
+
+            token = tokens[i++];
+            Assert.AreEqual(Type.Bool, token.Lexeme);
+            Assert.AreEqual(3, token.Line);
+
+            token = tokens[i++];
+            Assert.AreEqual(ReservedKeyword.Assignment, token.Lexeme);
+            Assert.AreEqual(3, token.Line);
+
+            token = tokens[i++];
+            Assert.AreEqual("true", token.Lexeme);
+            Assert.IsTrue(((TokenTerminal<bool>)token).Value);
+            Assert.AreEqual(3, token.Line);
+
+            token = tokens[i++];
+            Assert.AreEqual(ReservedKeyword.Semicolon, token.Lexeme);
+            Assert.AreEqual(3, token.Line);
+
+            Assert.AreEqual(i, tokens.Count);
         }
     }
 }

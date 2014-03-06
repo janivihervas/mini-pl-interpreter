@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using HelperFunctions;
+using MiniPL.Exceptions;
 
 namespace MiniPL.FrontEnd
 {
@@ -23,6 +24,10 @@ namespace MiniPL.FrontEnd
         /// <returns>Tokens</returns>
         public List<Token> Tokenize(List<string> lines)
         {
+            if ( lines == null )
+            {
+                throw new ScannerException("Lines were null");
+            }
             var tokens = new List<Token>();
             for (_row = 0; _row < lines.Count; _row++)
             {
@@ -35,10 +40,16 @@ namespace MiniPL.FrontEnd
                     {
                         break;
                     }
+                    if ( _column < line.Length - 1 && line[_column] == '/' && line[_column + 1] == '*' ) // Multiline comment
+                    {
+                        SkipMultilineComment(lines);
+                        continue;
+                    }
                     if (_column < line.Length - 1 && line[_column] == '/' && line[_column + 1] == '/') // line comment
                     {
                         break;
                     }
+
                     Token token;
 
                     if ( (token = CreateTypeToken(line)) != null )
@@ -77,10 +88,38 @@ namespace MiniPL.FrontEnd
 
 
         /// <summary>
+        /// Skips multiline comments
+        /// </summary>
+        /// <param name="lines">Source code lines</param>
+        private void SkipMultilineComment(List<string> lines)
+        {
+            if (_column >= lines[_row].Length - 1 || lines[_row][_column] != '/' || lines[_row][_column + 1] != '*')
+            {
+                return;
+            }
+            _column += 2;
+            while (_row < lines.Count)
+            {
+                while (_column < lines[_row].Length)
+                {
+                    if (_column < lines[_row].Length - 1 && lines[_row][_column] == '*' && lines[_row][_column + 1] == '/') 
+                    {
+                        _column += 2;
+                        return;
+                    }
+                    _column++;
+                }
+                _column = 0;
+                _row++;
+            }
+        }
+
+
+        /// <summary>
         /// Skips whitespaces in the current line
         /// </summary>
-        /// <param name="line"></param>
-        /// <returns>Boolean whether to stop scanning</returns>
+        /// <param name="line">Current line</param>
+        /// <returns>Boolean whether to stop the scanning of this line</returns>
         private bool SkipWhiteSpace(string line)
         {
             while (_column < line.Length && Char.IsWhiteSpace(line[_column]))

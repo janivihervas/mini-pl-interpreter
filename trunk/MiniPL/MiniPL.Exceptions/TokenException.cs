@@ -10,7 +10,10 @@ namespace MiniPL.Exceptions
     /// </summary>
     public class TokenException : Exception
     {
-        public TokenException(string message) : base(message)
-        { }
+        /// <summary>
+        /// Creates a new token exception
+        /// </summary>
+        /// <param name="message">Message to be passed on with the exception</param>
+        public TokenException(string message) : base(message) {}
     }
 }
