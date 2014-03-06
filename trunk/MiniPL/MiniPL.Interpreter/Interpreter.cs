@@ -45,6 +45,8 @@ namespace MiniPL.Interpreter
                 var lines = fileReader.ReadFile(args[0]);
                 var scanner = new Scanner();
                 var tokens = scanner.Tokenize(lines);
+                var parser = new Parser();
+                parser.Parse(tokens);
 
             } catch (Exception e)
             {
