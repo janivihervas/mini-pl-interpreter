@@ -8,7 +8,7 @@ namespace MiniPL.FrontEnd
     /// <summary>
     /// Types
     /// </summary>
-    public struct Type
+    public struct Types
     {
         /// <summary>
         /// Boolean type
@@ -29,7 +29,7 @@ namespace MiniPL.FrontEnd
         /// Returns all the types in an order from shortest length to longest.
         /// </summary>
         /// <returns>All the types</returns>
-        public static IEnumerable<string> Types()
+        public static IEnumerable<string> GetTypes()
         {
             return new[] {Int, Bool, String};
         }

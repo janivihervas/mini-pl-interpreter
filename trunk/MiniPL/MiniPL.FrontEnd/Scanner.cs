@@ -178,7 +178,7 @@ namespace MiniPL.FrontEnd
         /// <returns>New token for reserved keywords or null</returns>
         private Token CreateReservedKeywordToken(string line)
         {
-            return CreateToken(line, ReservedKeyword.ReservedKeywords());
+            return CreateToken(line, ReservedKeywords.GetReservedKeywords());
         }
 
         
@@ -189,7 +189,7 @@ namespace MiniPL.FrontEnd
         /// <returns>New token for variable types or null, if it wasn't a type token</returns>
         private Token CreateTypeToken(string line)
         {
-            return CreateToken(line, Type.Types());
+            return CreateToken(line, Types.GetTypes());
         }
 
         
@@ -200,7 +200,7 @@ namespace MiniPL.FrontEnd
         /// <returns>New token for operators or null, if it wasn't an operator token</returns>
         private Token CreateOperatorToken(string line)
         {
-            return CreateToken(line, Operator.Operators());
+            return CreateToken(line, Operators.GetOperators());
         }
 
 
@@ -271,6 +271,7 @@ namespace MiniPL.FrontEnd
         /// <returns>New token for identifier or null</returns>
         private TokenIdentifier CreateIdentifierToken(string line)
         {
+            // TODO: check for reserved keywords
             if (!Char.IsLetter(line[_column])) // identifier must begin with a character
             {
                 return null;

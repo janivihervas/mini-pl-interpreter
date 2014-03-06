@@ -8,7 +8,7 @@ namespace MiniPL.FrontEnd
     /// <summary>
     /// Operators
     /// </summary>
-    public class Operator
+    public class Operators
     {
         #region Arithmetic operators
 
@@ -92,7 +92,7 @@ namespace MiniPL.FrontEnd
         /// Returns all the operators in an order that doesn't mess up the longest matching rule, i.e. ">=" is before ">".
         /// </summary>
         /// <returns>All the operators</returns>
-        public static IEnumerable<string> Operators()
+        public static IEnumerable<string> GetOperators()
         {
             return new[]
                        {

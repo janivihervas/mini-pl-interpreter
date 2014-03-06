@@ -8,7 +8,7 @@ namespace MiniPL.FrontEnd
     /// <summary>
     /// Reserved keywords (types are also reserved)
     /// </summary>
-    public struct ReservedKeyword
+    public struct ReservedKeywords
     {
         /// <summary>
         /// "assert"
@@ -77,7 +77,7 @@ namespace MiniPL.FrontEnd
         /// They are also ordered from shortest length to longest.
         /// </summary>
         /// <returns>All the reserved keywords</returns>
-        public static IEnumerable<string> ReservedKeywords()
+        public static IEnumerable<string> GetReservedKeywords()
         {
             return new[]
                        {

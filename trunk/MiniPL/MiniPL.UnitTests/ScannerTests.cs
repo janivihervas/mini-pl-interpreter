@@ -36,19 +36,19 @@ namespace MiniPL.UnitTests
             Assert.IsTrue(3 <= tokens.Count);
             
             Assert.IsTrue(tokens.Exists(x =>
-                                  x.Lexeme == Type.Int &&
+                                  x.Lexeme == Types.Int &&
                                   x.Line == 1 &&
                                   x.StartColumn == 9
                               ));
 
             Assert.IsTrue(tokens.Exists(x =>
-                                  x.Lexeme == Type.Bool &&
+                                  x.Lexeme == Types.Bool &&
                                   x.Line == 2 &&
                                   x.StartColumn == 10
                               ));
             
             Assert.IsTrue(tokens.Exists(x =>
-                                  x.Lexeme == Type.String &&
+                                  x.Lexeme == Types.String &&
                                   x.Line == 3 &&
                                   x.StartColumn == 11
                               ));
@@ -73,25 +73,25 @@ namespace MiniPL.UnitTests
 
             #region Arithmetic
             Assert.IsTrue(tokens.Exists(x =>
-                                  x.Lexeme == Operator.Plus &&
+                                  x.Lexeme == Operators.Plus &&
                                   x.Line == 1 &&
                                   x.StartColumn == 19
                               ));
 
             Assert.IsTrue(tokens.Exists(x =>
-                                  x.Lexeme == Operator.Minus &&
+                                  x.Lexeme == Operators.Minus &&
                                   x.Line == 1 &&
                                   x.StartColumn == 32
                               ));
 
             Assert.IsTrue(tokens.Exists(x =>
-                                  x.Lexeme == Operator.Multiply &&
+                                  x.Lexeme == Operators.Multiply &&
                                   x.Line == 1 &&
                                   x.StartColumn == 24
                               ));
 
             Assert.IsTrue(tokens.Exists(x =>
-                                  x.Lexeme == Operator.Divide &&
+                                  x.Lexeme == Operators.Divide &&
                                   x.Line == 1 &&
                                   x.StartColumn == 29
                               ));
@@ -99,13 +99,13 @@ namespace MiniPL.UnitTests
 
             #region Parenthesis
             Assert.IsTrue(tokens.Exists(x =>
-                                  x.Lexeme == Operator.ParenthesisLeft &&
+                                  x.Lexeme == Operators.ParenthesisLeft &&
                                   x.Line == 7 &&
                                   x.StartColumn == 7
                               ));
 
             Assert.IsTrue(tokens.Exists(x =>
-                                  x.Lexeme == Operator.ParenthesisRight &&
+                                  x.Lexeme == Operators.ParenthesisRight &&
                                   x.Line == 7 &&
                                   x.StartColumn == 13
                               ));
@@ -114,13 +114,13 @@ namespace MiniPL.UnitTests
 
             #region Logical
             Assert.IsTrue(tokens.Exists(x =>
-                                  x.Lexeme == Operator.And &&
+                                  x.Lexeme == Operators.And &&
                                   x.Line == 2 &&
                                   x.StartColumn == 23
                               ));
 
             Assert.IsTrue(tokens.Exists(x =>
-                                  x.Lexeme == Operator.Not &&
+                                  x.Lexeme == Operators.Not &&
                                   x.Line == 2 &&
                                   x.StartColumn == 17
                               ));
@@ -130,31 +130,31 @@ namespace MiniPL.UnitTests
             #region Comparison
 
             Assert.IsTrue(tokens.Exists(x =>
-                                  x.Lexeme == Operator.GreaterThan &&
+                                  x.Lexeme == Operators.GreaterThan &&
                                   x.Line == 4 &&
                                   x.StartColumn == 10
                               ));
 
             Assert.IsTrue(tokens.Exists(x =>
-                                  x.Lexeme == Operator.GreaterOrEqualThan &&
+                                  x.Lexeme == Operators.GreaterOrEqualThan &&
                                   x.Line == 5 &&
                                   x.StartColumn == 10
                               ));
 
             Assert.IsTrue(tokens.Exists(x =>
-                                  x.Lexeme == Operator.LesserThan &&
+                                  x.Lexeme == Operators.LesserThan &&
                                   x.Line == 3 &&
                                   x.StartColumn == 19
                               ));
 
             Assert.IsTrue(tokens.Exists(x =>
-                                  x.Lexeme == Operator.LesserOrEqualThan &&
+                                  x.Lexeme == Operators.LesserOrEqualThan &&
                                   x.Line == 6 &&
                                   x.StartColumn == 10
                               ));
 
             Assert.IsTrue(tokens.Exists(x =>
-                                  x.Lexeme == Operator.Equal &&
+                                  x.Lexeme == Operators.Equal &&
                                   x.Line == 7 &&
                                   x.StartColumn == 10
                               ));
@@ -184,63 +184,63 @@ namespace MiniPL.UnitTests
             Assert.IsTrue(12 <= tokens.Count);
 
             Assert.IsTrue(tokens.Exists(x =>
-                                  x.Lexeme == ReservedKeyword.Assert &&
+                                  x.Lexeme == ReservedKeywords.Assert &&
                                   x.Line == 4 &&
                                   x.StartColumn == 1
                               ));
             Assert.IsTrue(tokens.Exists(x =>
-                                  x.Lexeme == ReservedKeyword.Do &&
+                                  x.Lexeme == ReservedKeywords.Do &&
                                   x.Line == 8 &&
                                   x.StartColumn == 22
                               ));
             Assert.IsTrue(tokens.Exists(x =>
-                                  x.Lexeme == ReservedKeyword.End &&
+                                  x.Lexeme == ReservedKeywords.End &&
                                   x.Line == 10 &&
                                   x.StartColumn == 1
                               ));
             Assert.IsTrue(tokens.Exists(x =>
-                                  x.Lexeme == ReservedKeyword.For &&
+                                  x.Lexeme == ReservedKeywords.For &&
                                   x.Line == 8 &&
                                   x.StartColumn == 1
                               ));
             Assert.IsTrue(tokens.Exists(x =>
-                                  x.Lexeme == ReservedKeyword.In &&
+                                  x.Lexeme == ReservedKeywords.In &&
                                   x.Line == 8 &&
                                   x.StartColumn == 7
                               ));
             Assert.IsTrue(tokens.Exists(x =>
-                                  x.Lexeme == ReservedKeyword.Print &&
+                                  x.Lexeme == ReservedKeywords.Print &&
                                   x.Line == 9 &&
                                   x.StartColumn == 1
                               ));
             Assert.IsTrue(tokens.Exists(x =>
-                                  x.Lexeme == ReservedKeyword.Read &&
+                                  x.Lexeme == ReservedKeywords.Read &&
                                   x.Line == 11 &&
                                   x.StartColumn == 1
                               ));
             Assert.IsTrue(tokens.Exists(x =>
-                                  x.Lexeme == ReservedKeyword.Var &&
+                                  x.Lexeme == ReservedKeywords.Var &&
                                   x.Line == 3 &&
                                   x.StartColumn == 1
                               ));
 
             Assert.IsTrue(tokens.Exists(x =>
-                                  x.Lexeme == ReservedKeyword.Assignment &&
+                                  x.Lexeme == ReservedKeywords.Assignment &&
                                   x.Line == 2 &&
                                   x.StartColumn == 14
                               ));
             Assert.IsTrue(tokens.Exists(x =>
-                                  x.Lexeme == ReservedKeyword.Colon &&
+                                  x.Lexeme == ReservedKeywords.Colon &&
                                   x.Line == 1 &&
                                   x.StartColumn == 7
                               ));
             Assert.IsTrue(tokens.Exists(x =>
-                                  x.Lexeme == ReservedKeyword.Range &&
+                                  x.Lexeme == ReservedKeywords.Range &&
                                   x.Line == 8 &&
                                   x.StartColumn == 11
                               ));
             Assert.IsTrue(tokens.Exists(x =>
-                                  x.Lexeme == ReservedKeyword.Semicolon &&
+                                  x.Lexeme == ReservedKeywords.Semicolon &&
                                   x.Line == 6 &&
                                   x.StartColumn == 16
                               ));
@@ -347,7 +347,7 @@ namespace MiniPL.UnitTests
             Assert.AreEqual(1133, token.Value);
             Assert.AreEqual("1133", token.Lexeme);
 
-            Assert.AreEqual(Operator.Minus, previousToken.Lexeme);
+            Assert.AreEqual(Operators.Minus, previousToken.Lexeme);
         }
 
         [Test]
@@ -399,7 +399,7 @@ namespace MiniPL.UnitTests
             var i = 0;
 
             var token = tokens[i++];
-            Assert.AreEqual(ReservedKeyword.Var, token.Lexeme); Assert.AreEqual(1, token.Line); Assert.AreEqual(1, token.StartColumn); 
+            Assert.AreEqual(ReservedKeywords.Var, token.Lexeme); Assert.AreEqual(1, token.Line); Assert.AreEqual(1, token.StartColumn); 
 
             token = tokens[i++];
             Assert.AreEqual("nTimes", token.Lexeme);             
@@ -407,12 +407,12 @@ namespace MiniPL.UnitTests
             Assert.AreEqual("nTimes", ((TokenIdentifier)token).Identifier);
 
             token = tokens[i++];
-            Assert.AreEqual(ReservedKeyword.Colon, token.Lexeme);              
+            Assert.AreEqual(ReservedKeywords.Colon, token.Lexeme);              
             token = tokens[i++];
-            Assert.AreEqual(Type.Int, token.Lexeme);
+            Assert.AreEqual(Types.Int, token.Lexeme);
             
             token = tokens[i++];
-            Assert.AreEqual(ReservedKeyword.Assignment, token.Lexeme);  
+            Assert.AreEqual(ReservedKeywords.Assignment, token.Lexeme);  
             
             token = tokens[i++];
             Assert.AreEqual("0", token.Lexeme);  
@@ -420,10 +420,10 @@ namespace MiniPL.UnitTests
             Assert.AreEqual(0, ((TokenTerminal<int>)token).Value);
 
             token = tokens[i++];
-            Assert.AreEqual(ReservedKeyword.Semicolon, token.Lexeme);  
+            Assert.AreEqual(ReservedKeywords.Semicolon, token.Lexeme);  
             
             token = tokens[i++];
-            Assert.AreEqual(ReservedKeyword.Var, token.Lexeme);  
+            Assert.AreEqual(ReservedKeywords.Var, token.Lexeme);  
             
             token = tokens[i++];
             Assert.AreEqual("s", token.Lexeme);  
@@ -431,22 +431,22 @@ namespace MiniPL.UnitTests
             Assert.AreEqual("s", ((TokenIdentifier)token).Identifier);
 
             token = tokens[i++];
-            Assert.AreEqual(ReservedKeyword.Colon, token.Lexeme);  
+            Assert.AreEqual(ReservedKeywords.Colon, token.Lexeme);  
             
             token = tokens[i++];
-            Assert.AreEqual(Type.String, token.Lexeme);  
+            Assert.AreEqual(Types.String, token.Lexeme);  
             
             token = tokens[i++];
-            Assert.AreEqual(ReservedKeyword.Assignment, token.Lexeme);  
+            Assert.AreEqual(ReservedKeywords.Assignment, token.Lexeme);  
             
             token = tokens[i++];
             Assert.AreEqual("How many times?", token.Lexeme);  
             
             token = tokens[i++];
-            Assert.AreEqual(ReservedKeyword.Semicolon, token.Lexeme);  
+            Assert.AreEqual(ReservedKeywords.Semicolon, token.Lexeme);  
             
             token = tokens[i++];
-            Assert.AreEqual(ReservedKeyword.Print, token.Lexeme);  
+            Assert.AreEqual(ReservedKeywords.Print, token.Lexeme);  
             
             token = tokens[i++];
             Assert.AreEqual("s", token.Lexeme);  
@@ -454,10 +454,10 @@ namespace MiniPL.UnitTests
             Assert.AreEqual("s", ((TokenIdentifier)token).Identifier);
 
             token = tokens[i++];
-            Assert.AreEqual(ReservedKeyword.Semicolon, token.Lexeme);  
+            Assert.AreEqual(ReservedKeywords.Semicolon, token.Lexeme);  
             
             token = tokens[i++];
-            Assert.AreEqual(ReservedKeyword.Read, token.Lexeme);  
+            Assert.AreEqual(ReservedKeywords.Read, token.Lexeme);  
             
             token = tokens[i++]; 
             Assert.AreEqual("nTimes", token.Lexeme);  
@@ -465,27 +465,10 @@ namespace MiniPL.UnitTests
             Assert.AreEqual("nTimes", ((TokenIdentifier)token).Identifier);
 
             token = tokens[i++];
-            Assert.AreEqual(ReservedKeyword.Semicolon, token.Lexeme);  
+            Assert.AreEqual(ReservedKeywords.Semicolon, token.Lexeme);  
             
             token = tokens[i++];
-            Assert.AreEqual(ReservedKeyword.Var, token.Lexeme);  
-            
-            token = tokens[i++];
-            Assert.AreEqual("x", token.Lexeme);  
-            Assert.IsTrue(token is TokenIdentifier);
-            Assert.AreEqual("x", ((TokenIdentifier)token).Identifier);
-
-            token = tokens[i++];
-            Assert.AreEqual(ReservedKeyword.Colon, token.Lexeme);  
-            
-            token = tokens[i++];
-            Assert.AreEqual(Type.Int, token.Lexeme);  
-            
-            token = tokens[i++];
-            Assert.AreEqual(ReservedKeyword.Semicolon, token.Lexeme);  
-            
-            token = tokens[i++];
-            Assert.AreEqual(ReservedKeyword.For, token.Lexeme);  
+            Assert.AreEqual(ReservedKeywords.Var, token.Lexeme);  
             
             token = tokens[i++];
             Assert.AreEqual("x", token.Lexeme);  
@@ -493,7 +476,24 @@ namespace MiniPL.UnitTests
             Assert.AreEqual("x", ((TokenIdentifier)token).Identifier);
 
             token = tokens[i++];
-            Assert.AreEqual(ReservedKeyword.In, token.Lexeme);  
+            Assert.AreEqual(ReservedKeywords.Colon, token.Lexeme);  
+            
+            token = tokens[i++];
+            Assert.AreEqual(Types.Int, token.Lexeme);  
+            
+            token = tokens[i++];
+            Assert.AreEqual(ReservedKeywords.Semicolon, token.Lexeme);  
+            
+            token = tokens[i++];
+            Assert.AreEqual(ReservedKeywords.For, token.Lexeme);  
+            
+            token = tokens[i++];
+            Assert.AreEqual("x", token.Lexeme);  
+            Assert.IsTrue(token is TokenIdentifier);
+            Assert.AreEqual("x", ((TokenIdentifier)token).Identifier);
+
+            token = tokens[i++];
+            Assert.AreEqual(ReservedKeywords.In, token.Lexeme);  
             
             token = tokens[i++];
             Assert.AreEqual("0", token.Lexeme);  
@@ -501,7 +501,7 @@ namespace MiniPL.UnitTests
             Assert.AreEqual(0, ((TokenTerminal<int>)token).Value);
 
             token = tokens[i++];
-            Assert.AreEqual(ReservedKeyword.Range, token.Lexeme);  
+            Assert.AreEqual(ReservedKeywords.Range, token.Lexeme);  
             
             token = tokens[i++];
             Assert.AreEqual("nTimes", token.Lexeme);  
@@ -509,7 +509,7 @@ namespace MiniPL.UnitTests
             Assert.AreEqual("nTimes", ((TokenIdentifier)token).Identifier);
 
             token = tokens[i++];
-            Assert.AreEqual(Operator.Minus, token.Lexeme);  
+            Assert.AreEqual(Operators.Minus, token.Lexeme);  
             
             token = tokens[i++];
             Assert.AreEqual("1", token.Lexeme);  
@@ -517,10 +517,10 @@ namespace MiniPL.UnitTests
             Assert.AreEqual(1, ((TokenTerminal<int>)token).Value);
 
             token = tokens[i++];
-            Assert.AreEqual(ReservedKeyword.Do, token.Lexeme);  
+            Assert.AreEqual(ReservedKeywords.Do, token.Lexeme);  
             
             token = tokens[i++];
-            Assert.AreEqual(ReservedKeyword.Print, token.Lexeme);  
+            Assert.AreEqual(ReservedKeywords.Print, token.Lexeme);  
             
             token = tokens[i++];
             Assert.AreEqual("x", token.Lexeme);  
@@ -528,10 +528,10 @@ namespace MiniPL.UnitTests
             Assert.AreEqual("x", ((TokenIdentifier)token).Identifier);
 
             token = tokens[i++];
-            Assert.AreEqual(ReservedKeyword.Semicolon, token.Lexeme);  
+            Assert.AreEqual(ReservedKeywords.Semicolon, token.Lexeme);  
             
             token = tokens[i++];
-            Assert.AreEqual(ReservedKeyword.Print, token.Lexeme);  
+            Assert.AreEqual(ReservedKeywords.Print, token.Lexeme);  
             
             token = tokens[i++];
             Assert.AreEqual(" : Hello, World!\\n", token.Lexeme);  
@@ -539,19 +539,19 @@ namespace MiniPL.UnitTests
             Assert.AreEqual(" : Hello, World!\\n", ((TokenTerminal<string>)token).Value);
 
             token = tokens[i++];
-            Assert.AreEqual(ReservedKeyword.Semicolon, token.Lexeme);  
+            Assert.AreEqual(ReservedKeywords.Semicolon, token.Lexeme);  
             
             token = tokens[i++];
-            Assert.AreEqual(ReservedKeyword.End, token.Lexeme);  
+            Assert.AreEqual(ReservedKeywords.End, token.Lexeme);  
             
             token = tokens[i++];
-            Assert.AreEqual(ReservedKeyword.For, token.Lexeme);  
+            Assert.AreEqual(ReservedKeywords.For, token.Lexeme);  
             
             token = tokens[i++];
-            Assert.AreEqual(ReservedKeyword.Semicolon, token.Lexeme);  
+            Assert.AreEqual(ReservedKeywords.Semicolon, token.Lexeme);  
             
             token = tokens[i++];
-            Assert.AreEqual(ReservedKeyword.Var, token.Lexeme);  
+            Assert.AreEqual(ReservedKeywords.Var, token.Lexeme);  
             
             token = tokens[i++];
             Assert.AreEqual("b", token.Lexeme);  
@@ -559,13 +559,13 @@ namespace MiniPL.UnitTests
             Assert.AreEqual("b", ((TokenIdentifier)token).Identifier);
 
             token = tokens[i++];
-            Assert.AreEqual(ReservedKeyword.Colon, token.Lexeme);  
+            Assert.AreEqual(ReservedKeywords.Colon, token.Lexeme);  
             
             token = tokens[i++];
-            Assert.AreEqual(Type.Bool, token.Lexeme);  
+            Assert.AreEqual(Types.Bool, token.Lexeme);  
             
             token = tokens[i++];
-            Assert.AreEqual(ReservedKeyword.Assignment, token.Lexeme);  
+            Assert.AreEqual(ReservedKeywords.Assignment, token.Lexeme);  
             
             token = tokens[i++];
             Assert.AreEqual("x", token.Lexeme);  
@@ -573,7 +573,7 @@ namespace MiniPL.UnitTests
             Assert.AreEqual("x", ((TokenIdentifier)token).Identifier);
 
             token = tokens[i++];
-            Assert.AreEqual(Operator.Equal, token.Lexeme);  
+            Assert.AreEqual(Operators.Equal, token.Lexeme);  
             
             token = tokens[i++];
             Assert.AreEqual("nTimes", token.Lexeme);  
@@ -581,13 +581,13 @@ namespace MiniPL.UnitTests
             Assert.AreEqual("nTimes", ((TokenIdentifier)token).Identifier);
 
             token = tokens[i++];
-            Assert.AreEqual(ReservedKeyword.Semicolon, token.Lexeme);  
+            Assert.AreEqual(ReservedKeywords.Semicolon, token.Lexeme);  
             
             token = tokens[i++];
-            Assert.AreEqual(ReservedKeyword.Assert, token.Lexeme);  
+            Assert.AreEqual(ReservedKeywords.Assert, token.Lexeme);  
             
             token = tokens[i++];
-            Assert.AreEqual(Operator.ParenthesisLeft, token.Lexeme);  
+            Assert.AreEqual(Operators.ParenthesisLeft, token.Lexeme);  
             
             token = tokens[i++];
             Assert.AreEqual("b", token.Lexeme);  
@@ -595,10 +595,10 @@ namespace MiniPL.UnitTests
             Assert.AreEqual("b", ((TokenIdentifier)token).Identifier);
 
             token = tokens[i++];
-            Assert.AreEqual(Operator.ParenthesisRight, token.Lexeme);  
+            Assert.AreEqual(Operators.ParenthesisRight, token.Lexeme);  
             
             token = tokens[i++];
-            Assert.AreEqual(ReservedKeyword.Semicolon, token.Lexeme);  
+            Assert.AreEqual(ReservedKeywords.Semicolon, token.Lexeme);  
 
             Assert.AreEqual(tokens.Count, i);
         }
@@ -618,7 +618,7 @@ namespace MiniPL.UnitTests
             var i = 0;
 
             var token = tokens[i++];
-            Assert.AreEqual(ReservedKeyword.Var, token.Lexeme);
+            Assert.AreEqual(ReservedKeywords.Var, token.Lexeme);
             Assert.AreEqual(1, token.Line);
 
             token = tokens[i++];
@@ -627,19 +627,19 @@ namespace MiniPL.UnitTests
             Assert.AreEqual(1, token.Line);
 
             token = tokens[i++];
-            Assert.AreEqual(ReservedKeyword.Colon, token.Lexeme);
+            Assert.AreEqual(ReservedKeywords.Colon, token.Lexeme);
             Assert.AreEqual(1, token.Line);
 
             token = tokens[i++];
-            Assert.AreEqual(Type.Int, token.Lexeme);
+            Assert.AreEqual(Types.Int, token.Lexeme);
             Assert.AreEqual(1, token.Line);
 
             token = tokens[i++];
-            Assert.AreEqual(ReservedKeyword.Semicolon, token.Lexeme);
+            Assert.AreEqual(ReservedKeywords.Semicolon, token.Lexeme);
             Assert.AreEqual(1, token.Line);
 
             token = tokens[i++];
-            Assert.AreEqual(ReservedKeyword.Var, token.Lexeme);
+            Assert.AreEqual(ReservedKeywords.Var, token.Lexeme);
             Assert.AreEqual(3, token.Line);
 
             token = tokens[i++];
@@ -648,15 +648,15 @@ namespace MiniPL.UnitTests
             Assert.AreEqual(3, token.Line);
 
             token = tokens[i++];
-            Assert.AreEqual(ReservedKeyword.Colon, token.Lexeme);
+            Assert.AreEqual(ReservedKeywords.Colon, token.Lexeme);
             Assert.AreEqual(3, token.Line);
 
             token = tokens[i++];
-            Assert.AreEqual(Type.Bool, token.Lexeme);
+            Assert.AreEqual(Types.Bool, token.Lexeme);
             Assert.AreEqual(3, token.Line);
 
             token = tokens[i++];
-            Assert.AreEqual(ReservedKeyword.Assignment, token.Lexeme);
+            Assert.AreEqual(ReservedKeywords.Assignment, token.Lexeme);
             Assert.AreEqual(3, token.Line);
 
             token = tokens[i++];
@@ -665,7 +665,7 @@ namespace MiniPL.UnitTests
             Assert.AreEqual(3, token.Line);
 
             token = tokens[i++];
-            Assert.AreEqual(ReservedKeyword.Semicolon, token.Lexeme);
+            Assert.AreEqual(ReservedKeywords.Semicolon, token.Lexeme);
             Assert.AreEqual(3, token.Line);
 
             Assert.AreEqual(i, tokens.Count);
@@ -687,7 +687,7 @@ namespace MiniPL.UnitTests
             var i = 0;
 
             var token = tokens[i++];
-            Assert.AreEqual(ReservedKeyword.Var, token.Lexeme);
+            Assert.AreEqual(ReservedKeywords.Var, token.Lexeme);
             Assert.AreEqual(1, token.Line);
 
             token = tokens[i++];
@@ -696,19 +696,19 @@ namespace MiniPL.UnitTests
             Assert.AreEqual(1, token.Line);
 
             token = tokens[i++];
-            Assert.AreEqual(ReservedKeyword.Colon, token.Lexeme);
+            Assert.AreEqual(ReservedKeywords.Colon, token.Lexeme);
             Assert.AreEqual(1, token.Line);
 
             token = tokens[i++];
-            Assert.AreEqual(Type.Int, token.Lexeme);
+            Assert.AreEqual(Types.Int, token.Lexeme);
             Assert.AreEqual(1, token.Line);
 
             token = tokens[i++];
-            Assert.AreEqual(ReservedKeyword.Semicolon, token.Lexeme);
+            Assert.AreEqual(ReservedKeywords.Semicolon, token.Lexeme);
             Assert.AreEqual(1, token.Line);
 
             token = tokens[i++];
-            Assert.AreEqual(ReservedKeyword.Var, token.Lexeme);
+            Assert.AreEqual(ReservedKeywords.Var, token.Lexeme);
             Assert.AreEqual(3, token.Line);
 
             token = tokens[i++];
@@ -717,15 +717,15 @@ namespace MiniPL.UnitTests
             Assert.AreEqual(3, token.Line);
 
             token = tokens[i++];
-            Assert.AreEqual(ReservedKeyword.Colon, token.Lexeme);
+            Assert.AreEqual(ReservedKeywords.Colon, token.Lexeme);
             Assert.AreEqual(3, token.Line);
 
             token = tokens[i++];
-            Assert.AreEqual(Type.Bool, token.Lexeme);
+            Assert.AreEqual(Types.Bool, token.Lexeme);
             Assert.AreEqual(3, token.Line);
 
             token = tokens[i++];
-            Assert.AreEqual(ReservedKeyword.Assignment, token.Lexeme);
+            Assert.AreEqual(ReservedKeywords.Assignment, token.Lexeme);
             Assert.AreEqual(3, token.Line);
 
             token = tokens[i++];
@@ -734,7 +734,7 @@ namespace MiniPL.UnitTests
             Assert.AreEqual(3, token.Line);
 
             token = tokens[i++];
-            Assert.AreEqual(ReservedKeyword.Semicolon, token.Lexeme);
+            Assert.AreEqual(ReservedKeywords.Semicolon, token.Lexeme);
             Assert.AreEqual(3, token.Line);
 
             Assert.AreEqual(i, tokens.Count);

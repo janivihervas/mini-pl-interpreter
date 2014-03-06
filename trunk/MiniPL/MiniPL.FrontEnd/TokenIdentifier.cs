@@ -23,6 +23,7 @@
         /// <param name="identifier">Identifier</param>
         public TokenIdentifier(int line, int startColumn, string identifier) : base(line, startColumn, identifier)
         {
+            // TODO: check for reserved keywords
             Identifier = identifier;
         }
 
