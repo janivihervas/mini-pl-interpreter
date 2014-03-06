@@ -31,8 +31,11 @@ namespace MiniPL.FrontEnd
                 while (_column < line.Length)
                 {
                     var stop = SkipWhiteSpace(line);
-                    // TODO: skip comments
                     if (stop)
+                    {
+                        break;
+                    }
+                    if (_column < line.Length - 1 && line[_column] == '/' && line[_column + 1] == '/') // line comment
                     {
                         break;
                     }
@@ -65,7 +68,7 @@ namespace MiniPL.FrontEnd
                         tokens.Add(token);
                         continue;
                     }
-                    _column++; // TODO: Remove this when fully implemented
+                    _column++; // TODO: Error handling
                 }
             }
 
