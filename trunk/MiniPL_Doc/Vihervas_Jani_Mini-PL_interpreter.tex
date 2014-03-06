@@ -28,6 +28,10 @@ Keywords={compilers, Mini-PL, interpreter}
 \newcommand{\bb}[1]{\textbf{#1}}
 \newcommand{\ttt}[1]{\texttt{#1}}
 \newcommand{\e}{\epsilon}
+\newcommand{\s}{\ttt{ }}
+\newcommand{\integer}{\ttt{i}}
+\newcommand{\str}{\ttt{s}}
+\newcommand{\bool}{\ttt{b}}
 
 
 \begin{document}
@@ -49,37 +53,78 @@ Jani Viherväs\\
 
 \vfill
 
-Grammar
+Grammar:
 \begin{align*}
-<prog> &\to <stmts> \\
-<stmts> &\to <stmt> \bb{ ; } <stmts'> \\
-<stmts'> &\to \e \mid <stmts> \\
-<stmt> &\to \bb{var } <ident'> \bb{ : } <type> <stmt'> \\ 
-       &\mid <ident> \bb{ := } <expr> \\  
-       &\mid \bb{for } <ident> \bb{ in } <expr> \bb{ .. } <expr> \bb{ do } 
+<prog>\s \to \s &<stmts> \\
+<stmts>\s \to \s &<stmt> \bb{ ; } <stmts'> \\
+<stmts'>\s \to \s &\e \mid <stmts> \\
+<stmt>\s \to \s &\bb{var } <ident'> \bb{ : } <type> <stmt'> \\ 
+       \mid \s &<ident> \bb{ := } <expr> \\  
+       \mid \s &\bb{for } <ident> \bb{ in } <expr> \bb{ .. } <expr> \bb{ do } 
              <stmts> \bb{ end } \bb{for} \\
-       &\mid \bb{read } <ident> \\
-       &\mid \bb{print } <expr> \\
-       &\mid \bb{assert (}  <expr> \bb{ )} \\
-<stmt'> &\to \e \mid \bb{:= } <expr> \\
-<expr> &\to <opnd> <op> <opnd> \\
-       &\mid <expr'> <opnd> \\
-<expr'> &\to \e \mid <unary> \\
-<opnd> &\to <int> \\
-       &\mid <string> \\
-       &\mid <ident> \\
-       &\mid \bb{( } <expr> \bb{ )} \\
-<type> &\to \bb{int} \mid \bb{string} \mid \bb{bool} \\
-<reserved\ttt{ } keyword> &\to 
-              \bb{var} \mid \bb{for} \mid \bb{end} \mid \bb{in} \mid \bb{do} \mid \bb{read} \mid 
-              \bb{print} \mid \bb{int} \mid \bb{string} \mid \bb{bool} \mid
+       \mid \s &\bb{read } <ident> \\
+       \mid \s &\bb{print } <expr> \\
+       \mid \s &\bb{assert (}  <expr> \bb{ )} \\
+<stmt'>\s \to \s &\e \mid \bb{:= } <expr> \\
+<expr>\s \to \s &<opnd> <op> <opnd> \\
+<expr'>\s \to \s &\e \mid <unary> \\
+<opnd>\s \to \s &<int> \\
+       \mid \s &<string> \\
+       \mid \s &<expr'><bool> \\
+       \mid \s &<ident> \\
+       \mid \s &\bb{( } <expr> \bb{ )} \\
+<type>\s \to \s &\bb{int} \mid \bb{string} \mid \bb{bool} \\
+<reserved\s keyword>\s \to \s 
+              &\bb{var} \mid \bb{for} \mid \bb{end} \mid \bb{in} \mid \bb{do}
+              \mid \bb{read} \mid \bb{print} \mid \bb{int} \mid \bb{string} \mid \bb{bool} \mid
               \bb{assert} \\
-<unary> &\to \bb{!} \\
-<op> &\to \bb{+} \mid \bb{-} \mid \bb{*} \mid \bb{/} \mid \bb{<} \mid
+<unary>\s \to \s &\bb{!} \\
+<op>\s \to \s &\bb{+} \mid \bb{-} \mid \bb{*} \mid \bb{/} \mid \bb{<} \mid
 \bb{>} \mid \bb{<=} \mid \bb{>=} \mid \bb{=} \mid \bb{\&}
 \end{align*}
 
 $<ident'>$ adds identifier to symbol table, where as $<ident>$ looks the
 identifier from the symbol table. Operators $>$, $<=$ and $>=$ are added,
 because they are very easy to implement.
+
+Predict sets:
+\[
+\begin{array}{r|c}
+\text{Production} & \text{Predict set} \\
+\hline
+<prog>   & \bb{var}, <ident>, \bb{for}, \bb{read}, \bb{print}, \bb{assert} \\
+\hline
+<stmts>  & \bb{var}, <ident>, \bb{for}, \bb{read}, \bb{print}, \bb{assert} \\
+\hline
+<stmts'> & \$\$ \\
+         & \bb{var}, <ident>, \bb{for}, \bb{read}, \bb{print}, \bb{assert} \\
+\hline
+<stmt>   & \bb{var}  \\
+         & <ident>  \\
+         & \bb{for}  \\
+         & \bb{read}  \\
+         & \bb{print}  \\
+         & \bb{assert}  \\
+\hline
+<stmt'>  & \bb{;} \\
+         & \bb{:=}  \\
+\hline
+<expr>   & \integer, \str, \bb{!}, \bool, <ident>, ( \\
+\hline
+<expr'>  & \bool \\
+         & \bb{!}  \\
+\hline
+<opnd>   & \integer  \\
+         & \str  \\
+         & \bb{!}, \bool  \\
+         & <ident>  \\
+         & (  \\
+\hline
+<type>   & \bb{int} \\
+         & \bb{string} \\
+         & \bb{bool} \\
+\hline
+\end{array}
+\]
+
 \end{document}
