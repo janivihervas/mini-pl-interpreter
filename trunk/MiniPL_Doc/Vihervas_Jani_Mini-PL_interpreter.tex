@@ -66,13 +66,14 @@ Grammar:
        \mid \s &\bb{print } <expr> \\
        \mid \s &\bb{assert (}  <expr> \bb{ )} \\
 <stmt'>\s \to \s &\e \mid \bb{:= } <expr> \\
-<expr>\s \to \s &<opnd> <op> <opnd> \\
-<expr'>\s \to \s &\e \mid <unary> \\
+<expr>\s \to \s &<opnd> <expr'> \\
+<expr'>\s \to \s &\e \mid <op> <opnd> \\
 <opnd>\s \to \s &<int> \\
        \mid \s &<string> \\
-       \mid \s &<expr'><bool> \\
+       \mid \s &<opnd'><bool> \\
        \mid \s &<ident> \\
        \mid \s &\bb{( } <expr> \bb{ )} \\
+<opnd'>\s \to \s &\e \mid <unary> \\
 <type>\s \to \s &\bb{int} \mid \bb{string} \mid \bb{bool} \\
 <reserved\s keyword>\s \to \s 
               &\bb{var} \mid \bb{for} \mid \bb{end} \mid \bb{in} \mid \bb{do}
@@ -80,11 +81,11 @@ Grammar:
               \mid \s &\bb{int} \mid \bb{string} \mid \bb{bool}  \mid \ttt{true} \mid \ttt{false}\\
 <unary>\s \to \s &\bb{!} \\
 <op>\s \to \s &\bb{+} \mid \bb{-} \mid \bb{*} \mid \bb{/} \mid \bb{<} \mid
-\bb{>} \mid \bb{<=} \mid \bb{>=} \mid \bb{=} \mid \bb{\&}
+\bb{>} \mid \bb{<=} \mid \bb{>=} \mid \bb{!=} \mid \bb{=} \mid\bb{\&}
 \end{align*}
 
 $<ident'>$ adds identifier to symbol table, where as $<ident>$ looks the
-identifier from the symbol table. Operators $>$, $<=$ and $>=$ are added,
+identifier from the symbol table. Operators $>$, $<=$, $>=$ and $!=$ are added,
 because they are very easy to implement.
 
 Predict sets:
@@ -111,14 +112,17 @@ Predict sets:
 \hline
 <expr>   & \integer, \str, \bb{!}, \bool, <ident>, ( \\
 \hline
-<expr'>  & \bool \\
-         & \bb{!}  \\
+<expr'>  & \bb{;}, \bb{..}, \bb{do} \\
+         & \integer, \str, \bb{!}, \bool, <ident>, ( \\ 
 \hline
 <opnd>   & \integer  \\
          & \str  \\
          & \bb{!}, \bool  \\
          & <ident>  \\
          & (  \\
+\hline
+<opnd'>  & \bool \\
+         & \bb{!}  \\
 \hline
 <type>   & \bb{int} \\
          & \bb{string} \\
