@@ -26,6 +26,7 @@ namespace MiniPL.FrontEnd
                 throw new ParserException("Token list was null");
             }
             _tokens = tokens;
+            _i = 0;
             Statements();
         }
 
@@ -92,6 +93,11 @@ namespace MiniPL.FrontEnd
         private void StatementsAlt()
         {
             var token = NextToken();
+            if (CheckToken(token, ReservedKeywords.End))
+            {
+                _i--;
+                return;
+            }
             if (token != null)
             {
                 _i--; // there were more tokens
@@ -118,7 +124,7 @@ namespace MiniPL.FrontEnd
                             ThrowParserException(token);
                         }
                         Type();
-                        Statement_();
+                        StatementAlt();
                         return;
                     }
                 case ReservedKeywords.For:
@@ -183,18 +189,36 @@ namespace MiniPL.FrontEnd
             }
             if ( token is TokenIdentifier )
             {
-
+                _i--;
+                Identifier();
+                token = NextToken();
+                if (!CheckToken(token, ReservedKeywords.Assignment))
+                {
+                    ThrowParserException(token);
+                }
+                Expression();
+                return;
             }
-
+            //ThrowParserException(token);
         }
 
 
         /// <summary>
         /// Handles the "stmt'" production
         /// </summary>
-        private void Statement_()
+        private void StatementAlt()
         {
-            
+            var token = NextToken();
+            if (CheckToken(token, ReservedKeywords.Semicolon)) // epsilon
+            {
+                _i--;
+                return;
+            }
+            if (!CheckToken(token, ReservedKeywords.Assignment))
+            {
+                ThrowParserException(token);
+            }
+            Expression();
         }
 
 
@@ -203,7 +227,8 @@ namespace MiniPL.FrontEnd
         /// </summary>
         private void Expression()
         {
-            
+            Operand();
+            ExpressionAlt();
         }
 
 
@@ -212,16 +237,79 @@ namespace MiniPL.FrontEnd
         /// </summary>
         private void ExpressionAlt()
         {
-            
+            var token = NextToken();
+            if (CheckToken(token, ReservedKeywords.Semicolon) ||
+                CheckToken(token, ReservedKeywords.Range) ||
+                CheckToken(token, ReservedKeywords.Do) ||
+                CheckToken(token, Operators.ParenthesisRight) )
+            {
+                _i--;
+                return;
+            }
+            _i--;
+            Operator();
+            Operand();
         }
-
-
+        
+        
         /// <summary>
         /// Handles the "opnd" production
         /// </summary>
         private void Operand()
         {
-            
+            var token = NextToken();
+            if (token == null)
+            {
+                ThrowParserException(null);
+            }
+            if (token is TokenTerminal<int>)
+            {
+                return;
+            }
+            if (token is TokenTerminal<string>)
+            {
+                return;
+            }
+            if (token is TokenIdentifier)
+            {
+                _i--;
+                Identifier();
+                return;
+            }
+            if (CheckToken(token, Operators.ParenthesisLeft))
+            {
+                Expression();
+                token = NextToken();
+                if (!CheckToken(token, Operators.ParenthesisRight))
+                {
+                    ThrowParserException(token);
+                }
+                return;
+            }
+            _i--;
+            OperandAlt();
+            token = NextToken();
+            if (!(token is TokenTerminal<bool>))
+            {
+                ThrowParserException(token);
+            }
+
+        }
+
+
+        /// <summary>
+        /// Handles the "opnd'" production
+        /// </summary>
+        private void OperandAlt()
+        {
+            var token = NextToken();
+            if ( token is TokenTerminal<bool> ) // epsilon
+            {
+                _i--;
+                return;
+            }
+            _i--;
+            UnaryOperator();
         }
 
 
@@ -230,7 +318,27 @@ namespace MiniPL.FrontEnd
         /// </summary>
         private void Type()
         {
-            
+            var token = NextToken();
+            if (token == null)
+            {
+                ThrowParserException(null);
+            }
+            switch (token.Lexeme)
+            {
+                case Types.Int:
+                    {
+                        return;
+                    }
+                case Types.String:
+                    {
+                        return;
+                    }
+                case Types.Bool:
+                    {
+                        return;
+                    }
+            }
+            ThrowParserException(token);
         }
 
 
@@ -239,7 +347,60 @@ namespace MiniPL.FrontEnd
         /// </summary>
         private void Operator()
         {
-            
+            var token = NextToken();
+            if (token == null)
+            {
+                ThrowParserException(null);
+            }
+            switch (token.Lexeme)
+            {
+                case Operators.Plus:
+                    {
+                        return;
+                    }
+                case Operators.Minus:
+                    {
+                        return;
+                    }
+                case Operators.Multiply:
+                    {
+                        return;
+                    }
+                case Operators.Divide:
+                    {
+                        return;
+                    }
+                case Operators.LesserThan:
+                    {
+                        return;
+                    }
+                case Operators.GreaterThan:
+                    {
+                        return;
+                    }
+                case Operators.LesserOrEqualThan:
+                    {
+                        return;
+                    }
+                case Operators.GreaterOrEqualThan:
+                    {
+                        return;
+                    }
+                case Operators.Equal:
+                    {
+                        return;
+                    }
+                case Operators.NotEqual:
+                    {
+                        return;
+                    }
+                case Operators.And:
+                    {
+                        return;
+                    }
+            }
+            ThrowParserException(token);
+
         }
 
 
@@ -248,25 +409,37 @@ namespace MiniPL.FrontEnd
         /// </summary>
         private void UnaryOperator()
         {
-            
+            var token = NextToken();
+            if (!CheckToken(token, Operators.Not))
+            {
+                ThrowParserException(token);
+            }
         }
 
 
         /// <summary>
-        /// Handles the "ident" production
+        /// Handles the "ident" production. Looks the identifier from the symbol table
         /// </summary>
         private void Identifier()
         {
-            
+            var token = NextToken() as TokenIdentifier;
+            if (token == null || !SymbolTable.FindSymbol(token.Identifier))
+            {
+                ThrowParserException(token);
+            }
         }
 
 
         /// <summary>
-        /// Handles the "ident'" production
+        /// Handles the "ident'" production. Adds the identifier to the symbol table
         /// </summary>
         private void IdentifierAlt()
         {
-            
+            var token = NextToken() as TokenIdentifier;
+            if ( token == null || !SymbolTable.AddSymbol(token.Identifier) )
+            {
+                ThrowParserException(token);
+            }
         }
     }
 }

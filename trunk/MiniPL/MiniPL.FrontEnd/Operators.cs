@@ -61,6 +61,11 @@ namespace MiniPL.FrontEnd
         /// </summary>
         public const string Equal = "=";
 
+        /// <summary>
+        /// Not equal operator
+        /// </summary>
+        public const string NotEqual = "!=";
+
         #endregion
 
         #region Logical
@@ -98,9 +103,9 @@ namespace MiniPL.FrontEnd
                        {
                            Plus, Minus, Multiply, Divide,
                            ParenthesisLeft, ParenthesisRight,
-                           And, Not,
                            GreaterOrEqualThan, LesserOrEqualThan,
-                           GreaterThan, LesserThan, Equal
+                           GreaterThan, LesserThan, NotEqual, Equal,
+                           And, Not,
                        };
         }
     }

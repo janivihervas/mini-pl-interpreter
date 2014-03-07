@@ -66,6 +66,7 @@ namespace MiniPL.UnitTests
                                 "assert(3 >= 2);",
                                 "assert(x <= 12);",
                                 "assert(x = 8);",
+                                "assert(x != 8);"
                             };
 
             var tokens = _scanner.Tokenize(lines);
@@ -158,6 +159,12 @@ namespace MiniPL.UnitTests
                                   x.Line == 7 &&
                                   x.StartColumn == 10
                               ));
+
+            Assert.IsTrue(tokens.Exists(x =>
+                      x.Lexeme == Operators.NotEqual &&
+                      x.Line == 8 &&
+                      x.StartColumn == 10
+                  ));
 
             #endregion
         }
