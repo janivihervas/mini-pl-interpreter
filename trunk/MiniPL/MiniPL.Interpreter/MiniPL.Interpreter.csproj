@@ -52,6 +52,10 @@
       <Project>{E95154B7-00EF-4F9E-84BC-392C906FAF6C}</Project>
       <Name>HelperFunctions</Name>
     </ProjectReference>
+    <ProjectReference Include="..\MiniPL.AbstractSyntaxTree\MiniPL.AbstractSyntaxTree.csproj">
+      <Project>{14d874a9-e973-406e-9f3f-fc8308ad348e}</Project>
+      <Name>MiniPL.AbstractSyntaxTree</Name>
+    </ProjectReference>
     <ProjectReference Include="..\MiniPL.Exceptions\MiniPL.Exceptions.csproj">
       <Project>{3c775989-bec5-475d-b5d1-cf4361b7ca68}</Project>
       <Name>MiniPL.Exceptions</Name>

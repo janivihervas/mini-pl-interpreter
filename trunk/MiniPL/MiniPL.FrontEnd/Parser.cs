@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using MiniPL.AbstractSyntaxTree;
 using MiniPL.Exceptions;
 
 namespace MiniPL.FrontEnd
@@ -19,7 +20,7 @@ namespace MiniPL.FrontEnd
         /// Parses the token list
         /// </summary>
         /// <param name="tokens">Tokens scanned</param>
-        public void Parse(List<Token> tokens) // TODO: construct the abstract syntax tree
+        public Statements Parse(List<Token> tokens) 
         {
             if (tokens == null)
             {
@@ -27,7 +28,8 @@ namespace MiniPL.FrontEnd
             }
             _tokens = tokens;
             _i = 0;
-            Statements();
+            var rootNode = Statements();
+            return rootNode;
         }
 
 
@@ -71,83 +73,74 @@ namespace MiniPL.FrontEnd
         /// <summary>
         /// Handles the "stmts" production
         /// </summary>
-        private void Statements()
+        private Statements Statements()
         {
-            Statement();
-            var token = NextToken();
-            if ( CheckToken(token, ReservedKeywords.Semicolon) )
+            var node = new Statements();
+            while (_i < _tokens.Count)
             {
-                StatementsAlt();
+                node.AddStatement(Statement());
+                var token = NextToken();
+                if ( !CheckToken(token, ReservedKeywords.Semicolon) )
+                {
+                    ThrowParserException(token);
+                    return null;
+                }
+                token = NextToken();
+                if (CheckToken(token, ReservedKeywords.End)) // end of for loop
+                {
+                    _i--;
+                    return node;
+                }
+                if (token != null) 
+                {
+                    _i--; // reverses the effects of the previous NextToken() call
+                }
             }
-            else
-            {
-                // TODO: error handling
-                ThrowParserException(token);
-            }
-        }
-
-
-        /// <summary>
-        /// Handles the "stmts'" production
-        /// </summary>
-        private void StatementsAlt()
-        {
-            var token = NextToken();
-            if (CheckToken(token, ReservedKeywords.End))
-            {
-                _i--;
-                return;
-            }
-            if (token != null)
-            {
-                _i--; // there were more tokens
-                Statements();
-            }
-            // else end of program to interpret
+            return node;
         }
 
 
         /// <summary>
         /// Handles the "stmt" production
         /// </summary>
-        private void Statement()
+        private Statement Statement()
         {
             var token = NextToken();
             switch (token.Lexeme)
             {
                 case ReservedKeywords.Var:
                     {
-                        IdentifierAlt();
+                        var identifier = IdentifierAlt();
                         token = NextToken();
                         if (!CheckToken(token, ReservedKeywords.Colon))
                         {
                             ThrowParserException(token);
                         }
-                        Type();
-                        StatementAlt();
-                        return;
+                        var type = Type();
+                        var expression = StatementAlt();
+                        return new StatementVarInitialize(identifier, type, expression);
                     }
                 case ReservedKeywords.For:
                     {
-                        Identifier();
+                        var identifier = Identifier();
                         token = NextToken();
                         if (!CheckToken(token, ReservedKeywords.In))
                         {
                             ThrowParserException(token);
                         }
-                        Expression();
+                        var firstExpr = Expression();
                         token = NextToken();
                         if (!CheckToken(token, ReservedKeywords.Range))
                         {
                             ThrowParserException(token);
                         }
-                        Expression();
+                        var secondExpr = Expression();
                         token = NextToken();
                         if (!CheckToken(token, ReservedKeywords.Do))
                         {
                             ThrowParserException(token);
                         }
-                        Statements();
+                        var stmts = Statements();
                         token = NextToken();
                         if (!CheckToken(token, ReservedKeywords.End))
                         {
@@ -158,18 +151,18 @@ namespace MiniPL.FrontEnd
                         {
                             ThrowParserException(token);
                         }
-                        return;
+                        return new StatementFor(identifier, firstExpr, secondExpr, stmts);
                     }
 
                 case ReservedKeywords.Read:
                     {
-                        Identifier();
-                        return;
+                        var id = Identifier();
+                        return new StatementRead(id);
                     }
                 case ReservedKeywords.Print:
                     {
-                        Expression();
-                        return;
+                        var expr = Expression();
+                        return new StatementPrint(expr);
                     }
                 case ReservedKeywords.Assert:
                     {
@@ -178,64 +171,67 @@ namespace MiniPL.FrontEnd
                         {
                             ThrowParserException(token);
                         }
-                        Expression();
+                        var expr = Expression();
                         token = NextToken();
                         if ( !CheckToken(token, Operators.ParenthesisRight) )
                         {
                             ThrowParserException(token);
                         }
-                        return;
+                        return new StatementAssert(expr);
                     }
             }
             if ( token is TokenIdentifier )
             {
                 _i--;
-                Identifier();
+                var id = Identifier();
                 token = NextToken();
                 if (!CheckToken(token, ReservedKeywords.Assignment))
                 {
                     ThrowParserException(token);
                 }
-                Expression();
-                return;
+                var expr = Expression();
+                return new StatementVarAssignment(id, expr);
             }
             //ThrowParserException(token);
+            return null;
         }
 
 
         /// <summary>
         /// Handles the "stmt'" production
         /// </summary>
-        private void StatementAlt()
+        private Expression StatementAlt()
         {
             var token = NextToken();
             if (CheckToken(token, ReservedKeywords.Semicolon)) // epsilon
             {
                 _i--;
-                return;
+                return null;
             }
             if (!CheckToken(token, ReservedKeywords.Assignment))
             {
                 ThrowParserException(token);
+                return null;
             }
-            Expression();
+            return Expression();
         }
 
 
         /// <summary>
         /// Handles the "expr" production
         /// </summary>
-        private void Expression()
+        private Expression Expression()
         {
-            Operand();
-            ExpressionAlt();
+            var operand = Operand();
+            var expr = ExpressionAlt();
+            return new Expression(operand, expr);
         }
 
 
         /// <summary>
         /// Handles the "expr'" production
         /// </summary>
-        private void ExpressionAlt()
+        private ExpressionTail ExpressionAlt()
         {
             var token = NextToken();
             if (CheckToken(token, ReservedKeywords.Semicolon) ||
@@ -244,202 +240,183 @@ namespace MiniPL.FrontEnd
                 CheckToken(token, Operators.ParenthesisRight) )
             {
                 _i--;
-                return;
+                return null;
             }
             _i--;
-            Operator();
-            Operand();
+            var op = Operator();
+            var operand = Operand();
+            return new ExpressionTail(op, operand);
         }
         
         
         /// <summary>
         /// Handles the "opnd" production
         /// </summary>
-        private void Operand()
+        private Value Operand()
         {
             var token = NextToken();
             if (token == null)
             {
                 ThrowParserException(null);
             }
-            if (token is TokenTerminal<int>)
+            var tokenInt = token as TokenTerminal<int>;
+            if ( tokenInt != null)
             {
-                return;
+                return new ValueType<int>(tokenInt.Value);
             }
-            if (token is TokenTerminal<string>)
+            var tokenString = token as TokenTerminal<string>;
+            if (tokenString != null)
             {
-                return;
+                return new ValueType<string>(tokenString.Value);
             }
             if (token is TokenIdentifier)
             {
                 _i--;
-                Identifier();
-                return;
+                var id = Identifier();
+                return new ValueVar(id);
             }
             if (CheckToken(token, Operators.ParenthesisLeft))
             {
-                Expression();
+                var expr = Expression();
                 token = NextToken();
                 if (!CheckToken(token, Operators.ParenthesisRight))
                 {
                     ThrowParserException(token);
                 }
-                return;
+                return new ValueExpression(expr);
             }
             _i--;
-            OperandAlt();
-            token = NextToken();
-            if (!(token is TokenTerminal<bool>))
+            var unary = OperandAlt();
+            var tokenBool = NextToken() as TokenTerminal<bool>;
+            if (tokenBool == null)
             {
-                ThrowParserException(token);
+                ThrowParserException(null);
+                return null;
             }
-
+            return new ValueType<bool>(unary && tokenBool.Value);
         }
 
 
         /// <summary>
         /// Handles the "opnd'" production
         /// </summary>
-        private void OperandAlt()
+        /// <returns>Boolean value of the ! operator, i.e. if there is ! operator, returns false and true otherwise</returns>
+        private bool OperandAlt()
         {
             var token = NextToken();
             if ( token is TokenTerminal<bool> ) // epsilon
             {
                 _i--;
-                return;
+                return true;
             }
             _i--;
-            UnaryOperator();
+            return UnaryOperator();
         }
 
 
         /// <summary>
         /// Handles the "type" production
         /// </summary>
-        private void Type()
+        private string Type()
         {
             var token = NextToken();
             if (token == null)
             {
                 ThrowParserException(null);
+                return null;
             }
             switch (token.Lexeme)
             {
                 case Types.Int:
                     {
-                        return;
+                        return Types.Int;
                     }
                 case Types.String:
                     {
-                        return;
+                        return Types.String;
                     }
                 case Types.Bool:
                     {
-                        return;
+                        return Types.Bool;
                     }
             }
             ThrowParserException(token);
+            return null;
         }
 
 
         /// <summary>
         /// Handles the "op" production
         /// </summary>
-        private void Operator()
+        private string Operator()
         {
             var token = NextToken();
             if (token == null)
             {
                 ThrowParserException(null);
+                return null;
             }
-            switch (token.Lexeme)
+            if ( token.Lexeme == Operators.Plus ||
+                 token.Lexeme == Operators.Minus ||
+                 token.Lexeme == Operators.Multiply ||
+                 token.Lexeme == Operators.Divide ||
+                 token.Lexeme == Operators.LesserThan ||
+                 token.Lexeme == Operators.GreaterThan ||
+                 token.Lexeme == Operators.LesserOrEqualThan ||
+                 token.Lexeme == Operators.GreaterOrEqualThan ||
+                 token.Lexeme == Operators.Equal ||
+                 token.Lexeme == Operators.NotEqual ||
+                 token.Lexeme == Operators.And )
             {
-                case Operators.Plus:
-                    {
-                        return;
-                    }
-                case Operators.Minus:
-                    {
-                        return;
-                    }
-                case Operators.Multiply:
-                    {
-                        return;
-                    }
-                case Operators.Divide:
-                    {
-                        return;
-                    }
-                case Operators.LesserThan:
-                    {
-                        return;
-                    }
-                case Operators.GreaterThan:
-                    {
-                        return;
-                    }
-                case Operators.LesserOrEqualThan:
-                    {
-                        return;
-                    }
-                case Operators.GreaterOrEqualThan:
-                    {
-                        return;
-                    }
-                case Operators.Equal:
-                    {
-                        return;
-                    }
-                case Operators.NotEqual:
-                    {
-                        return;
-                    }
-                case Operators.And:
-                    {
-                        return;
-                    }
+                return token.Lexeme;
             }
             ThrowParserException(token);
-
+            return null;
         }
 
 
         /// <summary>
         /// Handles the "unary" production
         /// </summary>
-        private void UnaryOperator()
+        private bool UnaryOperator()
         {
             var token = NextToken();
             if (!CheckToken(token, Operators.Not))
             {
                 ThrowParserException(token);
+                return true;
             }
+            return false;
         }
 
 
         /// <summary>
         /// Handles the "ident" production. Looks the identifier from the symbol table
         /// </summary>
-        private void Identifier()
+        private string Identifier()
         {
             var token = NextToken() as TokenIdentifier;
             if (token == null || !SymbolTable.FindSymbol(token.Identifier))
             {
                 ThrowParserException(token);
+                return null;
             }
+            return token.Identifier;
         }
 
 
         /// <summary>
         /// Handles the "ident'" production. Adds the identifier to the symbol table
         /// </summary>
-        private void IdentifierAlt()
+        private string IdentifierAlt()
         {
             var token = NextToken() as TokenIdentifier;
             if ( token == null || !SymbolTable.AddSymbol(token.Identifier) )
             {
                 ThrowParserException(token);
+                return null;
             }
+            return token.Identifier;
         }
     }
 }

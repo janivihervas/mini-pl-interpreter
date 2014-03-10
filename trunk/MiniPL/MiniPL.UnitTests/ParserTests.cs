@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using MiniPL.AbstractSyntaxTree;
 using MiniPL.FrontEnd;
 using NUnit.Framework;
 
@@ -32,6 +33,7 @@ namespace MiniPL.UnitTests
                                 "print s;", 
                                 "read nTimes;", 
                                 "var x : int;",
+                                "x := 0;",
                                 "for x in 0..nTimes-1 do ",
                                 "    print x;",
                                 "    print \" : Hello, World!\\n\";",
@@ -104,10 +106,72 @@ namespace MiniPL.UnitTests
             for ( var i = 0; i < _correctSourceCodeTokens.Length; i++ )
             {
                 var tokenList = _correctSourceCodeTokens[i];
-                Assert.DoesNotThrow(() => _parser.Parse(tokenList), "Source code to produce the error ( i = " + i + " ):\n\n" + String.Join("\n", _correctSourceCodes[i]) + "\n");
+                Statements ast = null;
+                Assert.DoesNotThrow(() => ast = _parser.Parse(tokenList), "Source code to produce the error ( i = " + i + " ):\n\n" + String.Join("\n", _correctSourceCodes[i]) + "\n");
+                Console.WriteLine(ast.ToString());
                 SymbolTable.DeleteAllSymbols();
             }
 
+        }
+
+        [Test]
+        public void TestParserProducesCorrectAbstractSyntaxTree()
+        {
+            var tokens = _correctSourceCodeTokens[1];
+            var ast = _parser.Parse(tokens);
+            SymbolTable.DeleteAllSymbols();
+
+            Assert.AreEqual(3, ast.StatementList.Count);
+
+            Assert.IsTrue(ast.StatementList[0] is StatementVarInitialize);
+            Assert.IsTrue(ast.StatementList[1] is StatementVarInitialize);
+            Assert.IsTrue(ast.StatementList[2] is StatementVarInitialize);
+
+            var statement = ast.StatementList[0] as StatementVarInitialize;
+            Assert.AreEqual("x", statement.Identifier);
+            Assert.AreEqual(Types.Int, statement.Type);
+            Assert.IsNull(statement.Expression);
+
+            statement = ast.StatementList[1] as StatementVarInitialize;
+            Assert.AreEqual("y", statement.Identifier);
+            Assert.AreEqual(Types.Bool, statement.Type);
+            Assert.IsNull(statement.Expression);
+
+            statement = ast.StatementList[2] as StatementVarInitialize;
+            Assert.AreEqual("z", statement.Identifier);
+            Assert.AreEqual(Types.String, statement.Type);
+            Assert.IsNull(statement.Expression);
+
+            tokens = _correctSourceCodeTokens[0];
+            ast = _parser.Parse(tokens);
+            SymbolTable.DeleteAllSymbols();
+
+            Assert.AreEqual(9, ast.StatementList.Count);
+
+            Assert.IsTrue(ast.StatementList[0] is StatementVarInitialize);
+            Assert.IsTrue(ast.StatementList[1] is StatementVarInitialize);
+            Assert.IsTrue(ast.StatementList[2] is StatementPrint);
+            Assert.IsTrue(ast.StatementList[3] is StatementRead);
+            Assert.IsTrue(ast.StatementList[4] is StatementVarInitialize);
+            Assert.IsTrue(ast.StatementList[5] is StatementVarAssignment);
+            Assert.IsTrue(ast.StatementList[6] is StatementFor);
+            Assert.IsTrue(ast.StatementList[7] is StatementVarInitialize);
+            Assert.IsTrue(ast.StatementList[8] is StatementAssert);
+
+            var print = ast.StatementList[2] as StatementPrint;
+            Assert.AreEqual("s", ((ValueVar)print.Expression.Operand).Identifier);
+
+            var read = ast.StatementList[3] as StatementRead;
+            Assert.AreEqual("nTimes", read.Identifier);
+
+            var assign = ast.StatementList[5] as StatementVarAssignment;
+            Assert.AreEqual("x", assign.Identifier);
+            Assert.AreEqual(0, ((ValueType<int>)assign.Expression.Operand).Value);
+
+            var statementsFor = (ast.StatementList[6] as StatementFor).Statements.StatementList;
+            Assert.AreEqual(2, statementsFor.Count);
+            Assert.IsTrue(statementsFor[0] is StatementPrint);
+            Assert.IsTrue(statementsFor[1] is StatementPrint);
         }
     }
 }
