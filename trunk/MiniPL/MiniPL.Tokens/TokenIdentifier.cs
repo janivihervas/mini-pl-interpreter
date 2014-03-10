@@ -1,4 +1,4 @@
-﻿namespace MiniPL.FrontEnd
+﻿namespace MiniPL.Tokens
 {
     /// @author Jani Viherväs
     /// @version 5.3.2014

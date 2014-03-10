@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HelperFunctions", "HelperFu
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MiniPL.AbstractSyntaxTree", "MiniPL.AbstractSyntaxTree\MiniPL.AbstractSyntaxTree.csproj", "{14D874A9-E973-406E-9F3F-FC8308AD348E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MiniPL.Tokens", "MiniPL.Tokens\MiniPL.Tokens.csproj", "{96125E0E-A4FD-4039-814C-632476299F37}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -43,6 +45,10 @@ Global
 		{14D874A9-E973-406E-9F3F-FC8308AD348E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{14D874A9-E973-406E-9F3F-FC8308AD348E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{14D874A9-E973-406E-9F3F-FC8308AD348E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{96125E0E-A4FD-4039-814C-632476299F37}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{96125E0E-A4FD-4039-814C-632476299F37}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{96125E0E-A4FD-4039-814C-632476299F37}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{96125E0E-A4FD-4039-814C-632476299F37}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace MiniPL.FrontEnd
+namespace MiniPL.Tokens
 {
     /// @author Jani Viherväs
     /// @version 28.2.2014

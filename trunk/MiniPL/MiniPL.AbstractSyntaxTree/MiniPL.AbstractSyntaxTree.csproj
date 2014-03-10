@@ -54,6 +54,18 @@
     <Compile Include="ValueExpression.cs" />
     <Compile Include="ValueType.cs" />
     <Compile Include="ValueVar.cs" />
+    <Compile Include="Variable.cs" />
+    <Compile Include="VariableType.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\MiniPL.Exceptions\MiniPL.Exceptions.csproj">
+      <Project>{3C775989-BEC5-475D-B5D1-CF4361B7CA68}</Project>
+      <Name>MiniPL.Exceptions</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\MiniPL.Tokens\MiniPL.Tokens.csproj">
+      <Project>{96125E0E-A4FD-4039-814C-632476299F37}</Project>
+      <Name>MiniPL.Tokens</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using MiniPL.AbstractSyntaxTree;
 using MiniPL.FrontEnd;
+using MiniPL.Tokens;
 using NUnit.Framework;
 
 namespace MiniPL.UnitTests

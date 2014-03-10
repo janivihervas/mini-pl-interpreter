@@ -40,6 +40,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AbstractSyntaxTreeTests.cs" />
     <Compile Include="FileReaderTests.cs" />
     <Compile Include="ParserTests.cs" />
     <Compile Include="ScannerTests.cs" />
@@ -66,6 +67,10 @@
     <ProjectReference Include="..\MiniPL.Interpreter\MiniPL.Interpreter.csproj">
       <Project>{4A1A494D-C8FC-4E97-8FFA-1FE1BCB85E43}</Project>
       <Name>MiniPL.Interpreter</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\MiniPL.Tokens\MiniPL.Tokens.csproj">
+      <Project>{96125E0E-A4FD-4039-814C-632476299F37}</Project>
+      <Name>MiniPL.Tokens</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
