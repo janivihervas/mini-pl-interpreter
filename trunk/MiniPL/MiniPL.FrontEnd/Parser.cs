@@ -27,6 +27,7 @@ namespace MiniPL.FrontEnd
             {
                 throw new ParserException("Token list was null");
             }
+            SymbolTable.DeleteAllSymbols();
             _tokens = tokens;
             _i = 0;
             var rootNode = Statements();
@@ -35,13 +36,27 @@ namespace MiniPL.FrontEnd
 
 
         /// <summary>
-        /// Gets the next token or null if there are no more tokens.
+        /// Gets the current token or null if there are no more tokens. 
+        /// Adds the counter so the next caller gets the next token.
         /// </summary>
-        /// <returns>The next token or null if there are no more tokens</returns>
+        /// <returns>The current token or null if there are no more tokens</returns>
         private Token NextToken()
         {
             return _i < _tokens.Count
                        ? _tokens[_i++]
+                       : null;
+        }
+
+
+        /// <summary>
+        /// Gets the current token or null if there are no more tokens. 
+        /// Doesn't add the counter so the next caller gets the same token.
+        /// </summary>
+        /// <returns>The current token or null if there are no more tokens</returns>
+        private Token CurrentToken()
+        {
+            return _i < _tokens.Count
+                       ? _tokens[_i]
                        : null;
         }
 
@@ -86,15 +101,10 @@ namespace MiniPL.FrontEnd
                     ThrowParserException(token);
                     return null;
                 }
-                token = NextToken();
+                token = CurrentToken();
                 if (CheckToken(token, ReservedKeywords.End)) // end of for loop
                 {
-                    _i--;
                     return node;
-                }
-                if (token != null) 
-                {
-                    _i--; // reverses the effects of the previous NextToken() call
                 }
             }
             return node;
@@ -223,37 +233,35 @@ namespace MiniPL.FrontEnd
         /// </summary>
         private Expression Expression()
         {
-            var operand = Operand();
-            var expr = ExpressionAlt();
-            return new Expression(operand, expr);
+            var expr = new Expression();
+            Operand(expr, true);
+            ExpressionAlt(expr);
+            return expr;
         }
 
 
         /// <summary>
         /// Handles the "expr'" production
         /// </summary>
-        private ExpressionTail ExpressionAlt()
+        private void ExpressionAlt(Expression expression)
         {
-            var token = NextToken();
+            var token = CurrentToken();
             if (CheckToken(token, ReservedKeywords.Semicolon) ||
                 CheckToken(token, ReservedKeywords.Range) ||
                 CheckToken(token, ReservedKeywords.Do) ||
                 CheckToken(token, Operators.ParenthesisRight) )
             {
-                _i--;
-                return null;
+                return;
             }
-            _i--;
-            var op = Operator();
-            var operand = Operand();
-            return new ExpressionTail(op, operand);
+            Operator(expression);
+            Operand(expression, false);
         }
         
         
         /// <summary>
         /// Handles the "opnd" production
         /// </summary>
-        private Value Operand()
+        private void Operand(Expression expression, bool addToFirst)
         {
             var token = NextToken();
             if (token == null)
@@ -263,28 +271,32 @@ namespace MiniPL.FrontEnd
             var tokenInt = token as TokenTerminal<int>;
             if ( tokenInt != null)
             {
-                return new ValueType<int>(tokenInt.Value);
+                expression.AddOperand(tokenInt, addToFirst);
+                return;
             }
             var tokenString = token as TokenTerminal<string>;
             if (tokenString != null)
             {
-                return new ValueType<string>(tokenString.Value);
+                expression.AddOperand(tokenString, addToFirst);
+                return;
             }
             if (token is TokenIdentifier)
             {
                 _i--;
-                var id = Identifier();
-                return new ValueVar(id);
+                Identifier();
+                expression.AddOperand(token as TokenIdentifier, addToFirst);
+                return;
             }
-            if (CheckToken(token, Operators.ParenthesisLeft))
+            if ( CheckToken(token, Operators.ParenthesisLeft) )
             {
                 var expr = Expression();
                 token = NextToken();
-                if (!CheckToken(token, Operators.ParenthesisRight))
+                if ( !CheckToken(token, Operators.ParenthesisRight) )
                 {
                     ThrowParserException(token);
                 }
-                return new ValueExpression(expr);
+                expression.AddExpression(expr, addToFirst);
+                return; 
             }
             _i--;
             var unary = OperandAlt();
@@ -292,9 +304,10 @@ namespace MiniPL.FrontEnd
             if (tokenBool == null)
             {
                 ThrowParserException(null);
-                return null;
+                return;
             }
-            return new ValueType<bool>(unary && tokenBool.Value);
+            tokenBool.Value = unary && tokenBool.Value;
+            expression.AddOperand(tokenBool, addToFirst);
         }
 
 
@@ -304,13 +317,11 @@ namespace MiniPL.FrontEnd
         /// <returns>Boolean value of the ! operator, i.e. if there is ! operator, returns false and true otherwise</returns>
         private bool OperandAlt()
         {
-            var token = NextToken();
+            var token = CurrentToken();
             if ( token is TokenTerminal<bool> ) // epsilon
             {
-                _i--;
                 return true;
             }
-            _i--;
             return UnaryOperator();
         }
 
@@ -349,13 +360,13 @@ namespace MiniPL.FrontEnd
         /// <summary>
         /// Handles the "op" production
         /// </summary>
-        private string Operator()
+        private void Operator(Expression expression)
         {
             var token = NextToken();
             if (token == null)
             {
                 ThrowParserException(null);
-                return null;
+                return;
             }
             if ( token.Lexeme == Operators.Plus ||
                  token.Lexeme == Operators.Minus ||
@@ -369,10 +380,10 @@ namespace MiniPL.FrontEnd
                  token.Lexeme == Operators.NotEqual ||
                  token.Lexeme == Operators.And )
             {
-                return token.Lexeme;
+                expression.Operator = token;
+                return;
             }
             ThrowParserException(token);
-            return null;
         }
 
 

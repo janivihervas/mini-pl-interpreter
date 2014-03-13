@@ -160,19 +160,21 @@ namespace MiniPL.UnitTests
             Assert.IsTrue(ast.StatementList[8] is StatementAssert);
 
             var print = ast.StatementList[2] as StatementPrint;
-            Assert.AreEqual("s", ((ValueVar)print.Expression.Operand).Identifier);
+            Assert.AreEqual("s", ((TokenIdentifier)print.Expression.FirstOperand).Identifier);
 
             var read = ast.StatementList[3] as StatementRead;
             Assert.AreEqual("nTimes", read.Identifier);
 
             var assign = ast.StatementList[5] as StatementVarAssignment;
             Assert.AreEqual("x", assign.Identifier);
-            Assert.AreEqual(0, ((ValueType<int>)assign.Expression.Operand).Value);
+            Assert.AreEqual(0, ((TokenTerminal<int>)assign.Expression.FirstOperand).Value);
 
             var statementsFor = (ast.StatementList[6] as StatementFor).Statements.StatementList;
             Assert.AreEqual(2, statementsFor.Count);
             Assert.IsTrue(statementsFor[0] is StatementPrint);
             Assert.IsTrue(statementsFor[1] is StatementPrint);
         }
+
+
     }
 }

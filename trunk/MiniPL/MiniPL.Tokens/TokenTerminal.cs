@@ -13,7 +13,7 @@ namespace MiniPL.Tokens
         /// <summary>
         /// Gets the token value
         /// </summary>
-        public T Value { get; private set; }
+        public T Value { get; set; }
 
         /// <summary>
         /// Creates a new terminal token. ATTENTION! This constructor handles the 0th column and row, DON'T add one to neither one.
