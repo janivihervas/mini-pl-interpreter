@@ -44,7 +44,6 @@ namespace MiniPL.AbstractSyntaxTree
         /// </summary>
         public override void Execute()
         {
-            DeleteAllVariables();
             foreach (var statement in StatementList)
             {
                 statement.Execute();

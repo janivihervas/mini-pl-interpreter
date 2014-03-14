@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics;
 
 namespace MiniPL.AbstractSyntaxTree
 {
@@ -25,6 +24,10 @@ namespace MiniPL.AbstractSyntaxTree
             Identifier = identifier;
         }
 
+
+        /// <summary>
+        /// Reads a value and assigns it to a variable
+        /// </summary>
         public override void Execute()
         {
             var value = Console.ReadLine();

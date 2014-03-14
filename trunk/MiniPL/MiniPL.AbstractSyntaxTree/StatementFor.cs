@@ -44,5 +44,22 @@
             SecondExpression = secondExpression;
             Statements = statements;
         }
+
+
+        /// <summary>
+        /// Executes the for loop
+        /// </summary>
+        public override void Execute()
+        {
+            var start = FirstExpression.EvaluateInt();
+            var finish = SecondExpression.EvaluateInt();
+            var iterator = (VariableType<int>)GetVariable(Identifier);
+            
+            for (var i = start; i <= finish; i++)
+            {
+                iterator.Value = i;
+                Statements.Execute();
+            }
+        }
     }
 }

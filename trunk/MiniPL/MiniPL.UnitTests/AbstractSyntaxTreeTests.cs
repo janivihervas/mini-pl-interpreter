@@ -266,5 +266,26 @@ namespace MiniPL.UnitTests
             Assert.AreEqual(3, i.Value);
             Assert.AreEqual(false, b.Value);
         }
+
+        [Test]
+        public void TestForLoopExecute()
+        {
+            var lines = new List<string>
+                            {
+                                "var i : int;",
+                                "for i in 1 .. 10 do", 
+                                "    print i; print \" \";",
+                                "end for;"
+                            };
+            var tree = _parser.Parse(_scanner.Tokenize(lines));
+
+            var writer = new StringWriter();
+            Console.SetOut(writer);
+
+            Assert.AreEqual("", writer.ToString());
+
+            tree.Execute();
+            Assert.AreEqual("1 2 3 4 5 6 7 8 9 10 ", writer.ToString());
+        }
     }
 }
