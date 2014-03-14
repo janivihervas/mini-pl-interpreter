@@ -31,6 +31,9 @@
         }
 
 
+        /// <summary>
+        /// Assigns a value to the variable
+        /// </summary>
         public override void Execute()
         {
             var variable = GetVariable(Identifier);

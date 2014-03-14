@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
 using MiniPL.AbstractSyntaxTree;
 using MiniPL.FrontEnd;
 using NUnit.Framework;
@@ -192,6 +194,26 @@ namespace MiniPL.UnitTests
             Assert.AreEqual(1, var1.Value);
             Assert.AreEqual(true, var2.Value);
             Assert.AreEqual("test", var3.Value);
+        }
+
+
+        [Test]
+        public void TestPrintExecute()
+        {
+            var lines = new List<string>
+                            {
+                                "var s : string := \"printing test\";",
+                                "print s;", 
+                            };
+            var tree = _parser.Parse(_scanner.Tokenize(lines));
+
+            var writer = new StringWriter();
+            Console.SetOut(writer);
+
+            Assert.AreEqual("", writer.ToString());
+
+            tree.Execute();
+            Assert.AreEqual("printing test", writer.ToString());
         }
 
     }

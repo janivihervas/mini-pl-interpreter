@@ -1,4 +1,6 @@
-﻿namespace MiniPL.AbstractSyntaxTree
+﻿using System;
+
+namespace MiniPL.AbstractSyntaxTree
 {
     /// @author Jani Viherväs
     /// @version 8.3.2014
@@ -20,6 +22,15 @@
         public StatementPrint(Expression expression)
         {
             Expression = expression;
+        }
+
+
+        /// <summary>
+        /// Prints the expression value
+        /// </summary>
+        public override void Execute()
+        {
+            Console.Write(Expression.EvaluateString());
         }
     }
 }
