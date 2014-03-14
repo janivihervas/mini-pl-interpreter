@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using MiniPL.AbstractSyntaxTree;
+using MiniPL.Exceptions;
 using MiniPL.FrontEnd;
 using NUnit.Framework;
 
@@ -286,6 +287,37 @@ namespace MiniPL.UnitTests
 
             tree.Execute();
             Assert.AreEqual("1 2 3 4 5 6 7 8 9 10 ", writer.ToString());
+        }
+
+        [Test]
+        public void TestAssertExecute()
+        {
+            var lines = new List<string>
+                            {
+                                "var b : bool := false;",
+                                "assert (b);", 
+                                "b := true;",
+                            };
+            Assert.Throws<AssertFailedException>(() => _parser.Parse(_scanner.Tokenize(lines)).Execute());
+            var variable1 = Statement.GetVariable("b") as VariableType<bool>;
+
+            Statement.DeleteAllVariables();
+
+            lines = new List<string>
+                            {
+                                "var b : bool := true;",
+                                "assert (b);", 
+                                "b := false;",
+                            };
+            Assert.DoesNotThrow(() => _parser.Parse(_scanner.Tokenize(lines)).Execute());
+
+            var variable2 = Statement.GetVariable("b") as VariableType<bool>;
+
+            Assert.NotNull(variable1);
+            Assert.AreEqual(false, variable1.Value);
+
+            Assert.NotNull(variable2);
+            Assert.AreEqual(false, variable2.Value);
         }
     }
 }

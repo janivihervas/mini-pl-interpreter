@@ -41,6 +41,7 @@
   <ItemGroup>
     <Compile Include="AbstractSyntaxTreeCalculateException.cs" />
     <Compile Include="AbstractSyntaxTreeException.cs" />
+    <Compile Include="AssertFailedException.cs" />
     <Compile Include="IOException.cs" />
     <Compile Include="ParserException.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

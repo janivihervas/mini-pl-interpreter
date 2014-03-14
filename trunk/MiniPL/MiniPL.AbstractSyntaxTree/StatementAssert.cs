@@ -1,4 +1,6 @@
-﻿namespace MiniPL.AbstractSyntaxTree
+﻿using MiniPL.Exceptions;
+
+namespace MiniPL.AbstractSyntaxTree
 {
     /// @author Jani Viherväs
     /// @version 8.3.2014
@@ -20,6 +22,17 @@
         public StatementAssert(Expression expression)
         {
             Expression = expression;
+        }
+
+        /// <summary>
+        /// Stop executing code if the assertion is false
+        /// </summary>
+        public override void Execute()
+        {
+            if ( !Expression.EvaluateBool() )
+            {
+                throw new AssertFailedException();
+            }
         }
     }
 }

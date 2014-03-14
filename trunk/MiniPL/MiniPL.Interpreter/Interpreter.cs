@@ -1,5 +1,6 @@
 ﻿using System;
 using HelperFunctions;
+using MiniPL.Exceptions;
 using MiniPL.FrontEnd;
 
 namespace MiniPL.Interpreter
@@ -48,11 +49,17 @@ namespace MiniPL.Interpreter
                 var parser = new Parser();
                 parser.Parse(tokens);
 
-            } catch (Exception e)
+            } 
+            catch(AssertFailedException)
+            {
+                // Code had an assert statement, which failed
+            }
+            catch (Exception e)
             {
                 Console.WriteLine(e.Message);
                 Console.ReadKey();
             }
+
 
         }
     }
