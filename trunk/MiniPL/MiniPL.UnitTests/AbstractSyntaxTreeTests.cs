@@ -203,7 +203,11 @@ namespace MiniPL.UnitTests
             var lines = new List<string>
                             {
                                 "var s : string := \"printing test\";",
+                                "var i : int := 2;",
+                                "var b : bool := true;",
                                 "print s;", 
+                                "print i;", 
+                                "print b;", 
                             };
             var tree = _parser.Parse(_scanner.Tokenize(lines));
 
@@ -213,7 +217,7 @@ namespace MiniPL.UnitTests
             Assert.AreEqual("", writer.ToString());
 
             tree.Execute();
-            Assert.AreEqual("printing test", writer.ToString());
+            Assert.AreEqual("printing test" + "2" + "true", writer.ToString());
         }
 
     }
