@@ -45,7 +45,7 @@ namespace HelperFunctions
 
             if (!fileName.Contains("\\"))
             {
-                path = Directory.GetCurrentDirectory() + fileName;
+                path = Directory.GetCurrentDirectory() + "\\" + fileName;
             }
             if (!File.Exists(path))
             {

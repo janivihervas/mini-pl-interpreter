@@ -24,7 +24,7 @@ namespace MiniPL.UnitTests
             _fileName = "test";
             _fileExtension = ".txt";
             _file = _fileName + _fileExtension;
-            _filePath = System.IO.Directory.GetCurrentDirectory();
+            _filePath = System.IO.Directory.GetCurrentDirectory() + "\\";
             _fileReader = new FileReader(_fileExtension);
             const string lines = "multiple lines1\n" +
                                  "multiple lines2\n" +

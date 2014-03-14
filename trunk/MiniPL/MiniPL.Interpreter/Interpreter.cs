@@ -29,12 +29,12 @@ namespace MiniPL.Interpreter
         /// <param name="args">File name or path/fileName</param>
         public static void Main(string[] args)
         {
-            if (args.Length < 1)
+            if ( args.Length < 1 )
             {
                 Console.WriteLine("You must give a file name or a path/fileName as a parameter");
                 return;
             }
-            if (args.Length > 1)
+            if ( args.Length > 1 )
             {
                 Console.WriteLine("Too many parameters");
                 return;
@@ -47,7 +47,8 @@ namespace MiniPL.Interpreter
                 var scanner = new Scanner();
                 var tokens = scanner.Tokenize(lines);
                 var parser = new Parser();
-                parser.Parse(tokens);
+                var tree = parser.Parse(tokens);
+                tree.Execute();
 
             } 
             catch(AssertFailedException)
