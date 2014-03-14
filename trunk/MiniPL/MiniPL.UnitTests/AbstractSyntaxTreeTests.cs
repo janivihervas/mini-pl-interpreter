@@ -165,5 +165,34 @@ namespace MiniPL.UnitTests
             Assert.AreEqual(true, var4.Value);
             Assert.AreEqual(false, var5.Value);
         }
+
+        [Test]
+        public void TestVarAssignmentExecute()
+        {
+            var lines = new List<string>
+                            {
+                                "var i : int;",
+                                "i := 1;", 
+                                "var b : bool;",
+                                "b := true;", 
+                                "var s : string;",
+                                "s := \"test\";", 
+                            };
+            var tree = _parser.Parse(_scanner.Tokenize(lines));
+            tree.Execute();
+
+            var var1 = Statement.GetVariable("i") as VariableType<int>;
+            var var2 = Statement.GetVariable("b") as VariableType<bool>;
+            var var3 = Statement.GetVariable("s") as VariableType<string>;
+
+            Assert.IsNotNull(var1);
+            Assert.IsNotNull(var2);
+            Assert.IsNotNull(var3);
+
+            Assert.AreEqual(1, var1.Value);
+            Assert.AreEqual(true, var2.Value);
+            Assert.AreEqual("test", var3.Value);
+        }
+
     }
 }

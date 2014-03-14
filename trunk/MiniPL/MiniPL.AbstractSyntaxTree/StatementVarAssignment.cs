@@ -29,5 +29,29 @@
             Identifier = identifier;
             Expression = expression;
         }
+
+
+        public override void Execute()
+        {
+            var variable = GetVariable(Identifier);
+            var i = variable as VariableType<int>;
+            var b = variable as VariableType<bool>;
+            var s = variable as VariableType<string>;
+
+            if (i != null)
+            {
+                i.Value = Expression.EvaluateInt();
+                return;
+            }
+            if ( b != null )
+            {
+                b.Value = Expression.EvaluateBool();
+                return;
+            }
+            if ( s != null )
+            {
+                s.Value = Expression.EvaluateString();
+            }
+        }
     }
 }
