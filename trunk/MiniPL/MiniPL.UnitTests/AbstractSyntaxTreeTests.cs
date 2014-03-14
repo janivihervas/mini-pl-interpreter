@@ -220,5 +220,51 @@ namespace MiniPL.UnitTests
             Assert.AreEqual("printing test" + "2" + "true", writer.ToString());
         }
 
+
+        [Test]
+        public void TestReadExecute()
+        {
+            var lines = new List<string>
+                            {
+                                "var s : string := \"printing test\";",
+                                "read s;", 
+                            };
+            var tree = _parser.Parse(_scanner.Tokenize(lines));
+
+            Console.SetIn(new StringReader("kapow!"));
+            tree.Execute();
+            var s = Statement.GetVariable("s") as VariableType<string>;
+
+            lines = new List<string>
+                            {
+                                "var i : int := 2;",
+                                "read i;", 
+                            };
+            tree = _parser.Parse(_scanner.Tokenize(lines));
+
+            Console.SetIn(new StringReader("3"));
+            tree.Execute();
+            
+            var i = Statement.GetVariable("i") as VariableType<int>;
+
+            lines = new List<string>
+                            {
+                                "var b : bool := true;",
+                                "read b;", 
+                            };
+            tree = _parser.Parse(_scanner.Tokenize(lines));
+
+            Console.SetIn(new StringReader("false"));
+            tree.Execute();
+            var b = Statement.GetVariable("b") as VariableType<bool>;
+
+            Assert.NotNull(s);
+            Assert.NotNull(i);
+            Assert.NotNull(b);
+
+            Assert.AreEqual("kapow!", s.Value);
+            Assert.AreEqual(3, i.Value);
+            Assert.AreEqual(false, b.Value);
+        }
     }
 }

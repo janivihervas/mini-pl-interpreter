@@ -250,7 +250,7 @@ namespace MiniPL.FrontEnd
                 var subString = line.Substring(_column, lenght);
                 try
                 {
-                    var value = Boolean.Parse(subString);
+                    var value = bool.Parse(subString);
                     var token = new TokenTerminal<bool>(_row, _column, value);
                     _column += subString.Length;
                     return token;
