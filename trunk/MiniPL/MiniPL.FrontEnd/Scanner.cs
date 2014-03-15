@@ -15,8 +15,25 @@ namespace MiniPL.FrontEnd
     /// </summary>
     public class Scanner
     {
+        /// <summary>
+        /// Current column
+        /// </summary>
         private int _column;
+
+        /// <summary>
+        /// Current row
+        /// </summary>
         private int _row;
+
+        /// <summary>
+        /// How many whitespaces where skipped. Used in combining consecutive error tokens 
+        /// </summary>
+        private int _whiteSpacesSkipped;
+
+        /// <summary>
+        /// Presivous token produced. Used in combining consecutive error tokens
+        /// </summary>
+        private Token _previousToken;
 
         /// <summary>
         /// Produces tokens for the parser.
@@ -56,31 +73,40 @@ namespace MiniPL.FrontEnd
                     if ( (token = CreateTypeToken(line)) != null )
                     {
                         tokens.Add(token);
+                        _previousToken = token;
                         continue;
                     }
                     if ( (token = CreateReservedKeywordToken(line)) != null )
                     {
                         tokens.Add(token);
+                        _previousToken = token;
                         continue;
                     }
 
                     if ( (token = CreateOperatorToken(line)) != null )
                     {
                         tokens.Add(token);
+                        _previousToken = token;
                         continue;
                     }
 
                     if ( (token = CreateTerminalToken(line)) != null )
                     {
                         tokens.Add(token);
+                        _previousToken = token;
                         continue;
                     }
                     if ( (token = CreateIdentifierToken(line)) != null )
                     {
                         tokens.Add(token);
+                        _previousToken = token;
                         continue;
                     }
-                    _column++; // TODO: Error handling
+                    if ( (token = CreateErrorToken(line)) != null)
+                    {
+                        tokens.Add(token);
+                        _previousToken = token;
+                    }
                 }
             }
 
@@ -123,9 +149,11 @@ namespace MiniPL.FrontEnd
         /// <returns>Boolean whether to stop the scanning of this line</returns>
         private bool SkipWhiteSpace(string line)
         {
+            _whiteSpacesSkipped = 0;
             while (_column < line.Length && Char.IsWhiteSpace(line[_column]))
             {
                 _column++;
+                _whiteSpacesSkipped++;
                 if (_column == line.Length)
                 {
                     return true;
@@ -272,7 +300,6 @@ namespace MiniPL.FrontEnd
         /// <returns>New token for identifier or null</returns>
         private TokenIdentifier CreateIdentifierToken(string line)
         {
-            // TODO: check for reserved keywords
             if (!Char.IsLetter(line[_column])) // identifier must begin with a character
             {
                 return null;
@@ -288,6 +315,29 @@ namespace MiniPL.FrontEnd
             _column += subString.Length;
             return token;
         }
+
+        private TokenError CreateErrorToken(string line)
+        {
+            var i = _column;
+            while ( i < line.Length )
+            {
+                if ( line[i] == ' ' || Char.IsLetterOrDigit(line[i]) )
+                {
+                    break;
+                }
+                i++;
+            }
+            var lexeme = line.Substring(_column, i - _column);
+            var token = new TokenError(_row, _column, lexeme);
+            _column += lexeme.Length;
+            var previous = _previousToken as TokenError;
+            if (previous != null )
+            {
+                previous.CombineErrorTokens(token, _whiteSpacesSkipped);
+                return null;
+            }
+            return token;
+        } 
 
     }
 }

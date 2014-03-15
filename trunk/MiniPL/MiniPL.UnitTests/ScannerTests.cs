@@ -403,7 +403,7 @@ namespace MiniPL.UnitTests
                             };
 
             var tokens = _scanner.Tokenize(lines);
-            Assert.IsTrue(57 == tokens.Count);
+            Assert.AreEqual(57, tokens.Count);
             var i = 0;
 
             var token = tokens[i++];
@@ -746,6 +746,54 @@ namespace MiniPL.UnitTests
             Assert.AreEqual(3, token.Line);
 
             Assert.AreEqual(i, tokens.Count);
+        }
+
+        [Test]
+        public void TestScannerProducesErrorTokens()
+        {
+            var lines = new List<string>
+                            {
+                                "var i : i.n.t := 1;"
+                            };
+            var tokens = _scanner.Tokenize(lines);
+
+            Assert.AreEqual(11, tokens.Count);
+            
+            var error1 = tokens[4] as TokenError;
+            var error2 = tokens[6] as TokenError;
+            
+            Assert.IsNotNull(error1);
+            Assert.IsNotNull(error2);
+
+            Assert.AreEqual(10, error1.StartColumn);
+            Assert.AreEqual(1, error1.Line);
+            Assert.AreEqual(".", error1.ErrorLexeme);
+
+            Assert.AreEqual(12, error2.StartColumn);
+            Assert.AreEqual(1, error2.Line);
+            Assert.AreEqual(".", error2.ErrorLexeme);
+        }
+
+        
+        [Test]
+        public void TestScannerCombinesErrorTokens()
+        {
+            var lines = new List<string>
+                            {
+                                ". .,, . var i : int;"
+                            };
+            var tokens = _scanner.Tokenize(lines);
+
+            Assert.AreEqual(6, tokens.Count);
+
+            var error = tokens[0] as TokenError;
+
+            Assert.IsNotNull(error);
+
+            Assert.AreEqual(1, error.StartColumn);
+            Assert.AreEqual(1, error.Line);
+            Assert.AreEqual(". .,, .", error.ErrorLexeme);
+
         }
     }
 }
