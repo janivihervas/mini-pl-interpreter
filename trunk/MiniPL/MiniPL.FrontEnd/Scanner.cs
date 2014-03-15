@@ -36,6 +36,11 @@ namespace MiniPL.FrontEnd
         private Token _previousToken;
 
         /// <summary>
+        /// Source code lines
+        /// </summary>
+        public static List<string> Lines;
+
+        /// <summary>
         /// Produces tokens for the parser.
         /// </summary>
         /// <param name="lines">Source code</param>
@@ -46,6 +51,7 @@ namespace MiniPL.FrontEnd
             {
                 throw new ScannerException("Lines were null");
             }
+            Lines = lines;
             var tokens = new List<Token>();
             for (_row = 0; _row < lines.Count; _row++)
             {
@@ -306,7 +312,7 @@ namespace MiniPL.FrontEnd
             }
 
             var lenght = 1;
-            while ( Char.IsLetterOrDigit(line[_column + lenght]) || line[_column + lenght] == '_')
+            while ( _column + lenght < line.Length && (Char.IsLetterOrDigit(line[_column + lenght]) || line[_column + lenght] == '_'))
             {
                 lenght++;
             }
