@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using MiniPL.AbstractSyntaxTree;
+using MiniPL.Exceptions;
 using MiniPL.FrontEnd;
 using MiniPL.Tokens;
 using NUnit.Framework;
@@ -173,6 +174,41 @@ namespace MiniPL.UnitTests
             Assert.AreEqual(2, statementsFor.Count);
             Assert.IsTrue(statementsFor[0] is StatementPrint);
             Assert.IsTrue(statementsFor[1] is StatementPrint);
+        }
+
+        [Test]
+        public void TestCanHandleMultipleSyntaxErrors()
+        {
+            // Missing semicolons
+            var lines = new List<string>
+                            {
+                                "var nTimes  int := 0",
+                                "var s ,,: string  \"How many times?\"",
+                                "print s",
+                                "read nTimes",
+                                "var x : int",
+                                "x = 0",
+                                "for x in 0..nTimes-1 ",
+                                "    print x",
+                                "    print \" : Hello, World!\\n\"",
+                                "end fo",
+                                "var b : bool := x = nTimes",
+                                "assert (b"
+                            };
+            var scanner = new Scanner();
+            try
+            {
+                var tokens = scanner.Tokenize(lines);
+                _parser.Parse(tokens);
+                Assert.Fail("Did not throw ParserException.");
+            }
+            catch (ParserException exception)
+            {
+                var errors = exception.Errors;
+                Assert.IsNotNull(errors);
+                Assert.IsTrue(0 < errors.Count);
+            }
+
         }
 
 

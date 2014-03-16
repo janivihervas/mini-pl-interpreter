@@ -767,11 +767,11 @@ namespace MiniPL.UnitTests
 
             Assert.AreEqual(10, error1.StartColumn);
             Assert.AreEqual(1, error1.Line);
-            Assert.AreEqual(".", error1.ErrorLexeme);
+            Assert.AreEqual(".", error1.Lexeme);
 
             Assert.AreEqual(12, error2.StartColumn);
             Assert.AreEqual(1, error2.Line);
-            Assert.AreEqual(".", error2.ErrorLexeme);
+            Assert.AreEqual(".", error2.Lexeme);
         }
 
         
@@ -792,7 +792,7 @@ namespace MiniPL.UnitTests
 
             Assert.AreEqual(1, error.StartColumn);
             Assert.AreEqual(1, error.Line);
-            Assert.AreEqual(". .,, .", error.ErrorLexeme);
+            Assert.AreEqual(". .,, .", error.Lexeme);
 
         }
     }

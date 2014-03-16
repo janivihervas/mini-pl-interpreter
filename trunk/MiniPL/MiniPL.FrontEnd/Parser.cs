@@ -16,6 +16,34 @@ namespace MiniPL.FrontEnd
     {
         private int _i;
         private List<Token> _tokens;
+        private List<SyntaxError> _syntaxErrors;
+
+        private static readonly List<string> FirstStatement = new List<string>
+                                                             {
+                                                                 ReservedKeywords.Var,
+                                                                 ReservedKeywords.For,
+                                                                 ReservedKeywords.Read,
+                                                                 ReservedKeywords.Print,
+                                                                 ReservedKeywords.Assert,
+                                                                 ReservedKeywords.End
+                                                             };
+
+        private static readonly List<string> FollowStatement = new List<string>
+                                                             {
+                                                                 ReservedKeywords.Semicolon
+                                                             };
+
+        private static readonly List<string> FollowStatementAlt = new List<string>
+                                                             {
+                                                                 ReservedKeywords.Semicolon
+                                                             };
+
+        private static readonly List<string> FollowType = new List<string>
+                                                             {
+                                                                 ReservedKeywords.Semicolon,
+                                                                 ReservedKeywords.Assignment
+                                                             };
+
 
         /// <summary>
         /// Parses the token list
@@ -28,9 +56,14 @@ namespace MiniPL.FrontEnd
                 throw new ParserException("Token list was null");
             }
             SymbolTable.DeleteAllSymbols();
+            _syntaxErrors = new List<SyntaxError>();
             _tokens = tokens;
             _i = 0;
             var rootNode = Statements();
+            if (0 < _syntaxErrors.Count)
+            {
+                throw new ParserException(_syntaxErrors);
+            }
             return rootNode;
         }
 
@@ -73,16 +106,82 @@ namespace MiniPL.FrontEnd
         }
 
         /// <summary>
-        /// Temporary method to throw exceptions
+        /// Skips tokens until one with the lexeme that is in the follow set
+        /// </summary>
+        /// <param name="followSet">Follow set</param>
+        private void SkipTokens(List<string> followSet)
+        {
+            _i--;
+            while (_i < _tokens.Count && !followSet.Contains(CurrentToken().Lexeme))
+            {
+                _i++;
+            }
+        }
+
+        /// <summary>
+        /// Skips tokens until one with the lexeme that is in the follow set or until next expression
+        /// </summary>
+        /// <param name="followSet">Follow set</param>
+        private void SkipTokensUntilExpression(List<string> followSet)
+        {
+            _i--;
+            while ( _i < _tokens.Count && !followSet.Contains(CurrentToken().Lexeme) &&
+                !(CurrentToken() is TokenTerminal<int>) &&
+                !(CurrentToken() is TokenTerminal<string>) &&
+                !(CurrentToken() is TokenTerminal<bool>) &&
+                CurrentToken().Lexeme != Operators.Not)
+            {
+                _i++;
+            }
+        }
+
+
+        /// <summary>
+        /// Skips tokens until one with the lexeme that is in the follow set or until next statement
+        /// </summary>
+        /// <param name="followSet">Follow set</param>
+
+        private void SkipTokensUntilNextStatement(List<string> followSet )
+        {
+            if (_i < _tokens.Count)
+            {
+                _i--;
+            }
+            while ( _i < _tokens.Count && 
+                !(CurrentToken() is TokenIdentifier) &&
+                !FirstStatement.Contains(CurrentToken().Lexeme) &&
+                !followSet.Contains(CurrentToken().Lexeme) )
+            {
+                _i++;
+            }
+        }
+
+
+        /// <summary>
+        /// Adds a syntax error to the list of errors
         /// </summary>
         /// <param name="token">Current token</param>
-        private void ThrowParserException(Token token)
+        /// <param name="expectedLexeme">Expected lexeme</param>
+        /// <param name="useDefault">Use default message: "Was expecting {expectedLexeme}."</param>
+        private void AddSyntaxError(Token token, string expectedLexeme, bool useDefault = true)
         {
             if (token == null)
             {
-                throw new ParserException(String.Format("Unexpected ending of program, last token parsed was on line {0} starting at column {1}.", _tokens[_i - 1].Line, _tokens[_i - 1].StartColumn ));
+                _syntaxErrors.Add(
+                    new SyntaxError(Scanner.Lines[Scanner.Lines.Count - 1], Scanner.Lines.Count - 1, Scanner.Lines[Scanner.Lines.Count - 1].Length, String.Format("Unexpected end of file, was expecting {0}.", expectedLexeme)));
+                return;
             }
-            throw new ParserException(String.Format("Syntax error on line {0} starting at column {1}.", token.Line, token.StartColumn));
+            if (useDefault)
+            {
+                _syntaxErrors.Add(
+                    new SyntaxError(Scanner.Lines[token.Line - 1], token.Line, token.StartColumn, String.Format("Was expecting {0}.", expectedLexeme)));
+            }
+            else
+            {
+                _syntaxErrors.Add(
+                    new SyntaxError(Scanner.Lines[token.Line - 1], token.Line, token.StartColumn, expectedLexeme));
+
+            }
         }
 
         
@@ -98,8 +197,8 @@ namespace MiniPL.FrontEnd
                 var token = NextToken();
                 if ( !CheckToken(token, ReservedKeywords.Semicolon) )
                 {
-                    ThrowParserException(token);
-                    return null;
+                    AddSyntaxError(token, ReservedKeywords.Semicolon);
+                    SkipTokensUntilNextStatement(new List<string>{ReservedKeywords.End});
                 }
                 token = CurrentToken();
                 if (CheckToken(token, ReservedKeywords.End)) // end of for loop
@@ -125,7 +224,10 @@ namespace MiniPL.FrontEnd
                         token = NextToken();
                         if (!CheckToken(token, ReservedKeywords.Colon))
                         {
-                            ThrowParserException(token);
+                            AddSyntaxError(token, ReservedKeywords.Colon);
+                            var follow = new List<string>(Types.GetTypes());
+                            follow.AddRange(FollowStatement);
+                            SkipTokens(follow);
                         }
                         var type = Type();
                         var expression = StatementAlt();
@@ -137,30 +239,37 @@ namespace MiniPL.FrontEnd
                         token = NextToken();
                         if (!CheckToken(token, ReservedKeywords.In))
                         {
-                            ThrowParserException(token);
+                            AddSyntaxError(token, ReservedKeywords.In);
+                            SkipTokensUntilExpression(FollowStatement);
                         }
                         var firstExpr = Expression();
                         token = NextToken();
                         if (!CheckToken(token, ReservedKeywords.Range))
                         {
-                            ThrowParserException(token);
+                            AddSyntaxError(token, ReservedKeywords.Range);
+                            SkipTokensUntilExpression(FollowStatement);
                         }
                         var secondExpr = Expression();
                         token = NextToken();
                         if (!CheckToken(token, ReservedKeywords.Do))
                         {
-                            ThrowParserException(token);
+                            AddSyntaxError(token, ReservedKeywords.Do);
+                            SkipTokensUntilNextStatement(new List<string>{ReservedKeywords.Semicolon});
                         }
                         var stmts = Statements();
                         token = NextToken();
                         if (!CheckToken(token, ReservedKeywords.End))
                         {
-                            ThrowParserException(token);
+                            AddSyntaxError(token, ReservedKeywords.End);
+                            var follow = new List<string> {ReservedKeywords.For};
+                            follow.AddRange(FollowStatement);
+                            SkipTokens(follow);
                         }
                         token = NextToken();
                         if (!CheckToken(token, ReservedKeywords.For))
                         {
-                            ThrowParserException(token);
+                            AddSyntaxError(token, ReservedKeywords.For);
+                            SkipTokensUntilNextStatement(FollowStatement);
                         }
                         return new StatementFor(identifier, firstExpr, secondExpr, stmts);
                     }
@@ -180,13 +289,15 @@ namespace MiniPL.FrontEnd
                         token = NextToken();
                         if (!CheckToken(token, Operators.ParenthesisLeft))
                         {
-                            ThrowParserException(token);
+                            AddSyntaxError(token, Operators.ParenthesisLeft);
+                            SkipTokensUntilExpression(FollowStatement);
                         }
                         var expr = Expression();
                         token = NextToken();
                         if ( !CheckToken(token, Operators.ParenthesisRight) )
                         {
-                            ThrowParserException(token);
+                            AddSyntaxError(token, Operators.ParenthesisRight);
+                            SkipTokens(FollowStatement);
                         }
                         return new StatementAssert(expr);
                     }
@@ -198,12 +309,13 @@ namespace MiniPL.FrontEnd
                 token = NextToken();
                 if (!CheckToken(token, ReservedKeywords.Assignment))
                 {
-                    ThrowParserException(token);
+                    AddSyntaxError(token, ReservedKeywords.Assignment);
+                    SkipTokensUntilExpression(FollowStatement);
                 }
                 var expr = Expression();
                 return new StatementVarAssignment(id, expr);
             }
-            //ThrowParserException(token);
+            SkipTokens(FollowStatement);
             return null;
         }
 
@@ -221,8 +333,9 @@ namespace MiniPL.FrontEnd
             }
             if (!CheckToken(token, ReservedKeywords.Assignment))
             {
-                ThrowParserException(token);
-                return null;
+                AddSyntaxError(token, ReservedKeywords.Assignment);
+                SkipTokensUntilExpression(FollowStatementAlt);
+                //return null;
             }
             return Expression();
         }
@@ -253,6 +366,11 @@ namespace MiniPL.FrontEnd
             {
                 return;
             }
+            if (token != null && FirstStatement.Contains(token.Lexeme) || token is TokenIdentifier)
+            {
+                // syntax error
+                return;
+            }
             Operator(expression);
             Operand(expression, false);
         }
@@ -266,7 +384,8 @@ namespace MiniPL.FrontEnd
             var token = NextToken();
             if (token == null)
             {
-                ThrowParserException(null);
+                AddSyntaxError(null, "int, string, bool, (, or variable identifier");
+                return;
             }
             var tokenInt = token as TokenTerminal<int>;
             if ( tokenInt != null)
@@ -293,7 +412,7 @@ namespace MiniPL.FrontEnd
                 token = NextToken();
                 if ( !CheckToken(token, Operators.ParenthesisRight) )
                 {
-                    ThrowParserException(token);
+                    AddSyntaxError(token, Operators.ParenthesisRight);
                 }
                 expression.AddExpression(expr, addToFirst);
                 return; 
@@ -303,7 +422,7 @@ namespace MiniPL.FrontEnd
             var tokenBool = NextToken() as TokenTerminal<bool>;
             if (tokenBool == null)
             {
-                ThrowParserException(null);
+                AddSyntaxError(null, "bool");
                 return;
             }
             tokenBool.Value = unary && tokenBool.Value;
@@ -334,7 +453,7 @@ namespace MiniPL.FrontEnd
             var token = NextToken();
             if (token == null)
             {
-                ThrowParserException(null);
+                AddSyntaxError(null, String.Format("{0}, {1} or {2}", Types.Int, Types.String, Types.Bool));
                 return null;
             }
             switch (token.Lexeme)
@@ -352,7 +471,8 @@ namespace MiniPL.FrontEnd
                         return Types.Bool;
                     }
             }
-            ThrowParserException(token);
+            AddSyntaxError(token, String.Format("{0}, {1} or {2}", Types.Int, Types.String, Types.Bool));
+            SkipTokens(FollowType);
             return null;
         }
 
@@ -365,7 +485,7 @@ namespace MiniPL.FrontEnd
             var token = NextToken();
             if (token == null)
             {
-                ThrowParserException(null);
+                AddSyntaxError(null, "operator symbol");
                 return;
             }
             if ( token.Lexeme == Operators.Plus ||
@@ -383,7 +503,22 @@ namespace MiniPL.FrontEnd
                 expression.Operator = token;
                 return;
             }
-            ThrowParserException(token);
+            var op = new List<string>
+                         {
+                             Operators.Plus,
+                             Operators.Minus,
+                             Operators.Multiply,
+                             Operators.Divide,
+                             Operators.LesserThan,
+                             Operators.GreaterThan,
+                             Operators.LesserOrEqualThan,
+                             Operators.GreaterOrEqualThan,
+                             Operators.Equal,
+                             Operators.NotEqual,
+                             Operators.And
+                         };
+            AddSyntaxError(token, String.Join(", ", op));
+            SkipTokensUntilExpression(new List<string>());
         }
 
 
@@ -395,7 +530,12 @@ namespace MiniPL.FrontEnd
             var token = NextToken();
             if (!CheckToken(token, Operators.Not))
             {
-                ThrowParserException(token);
+                AddSyntaxError(token, Operators.Not);
+                _i--;
+                while (_i < _tokens.Count && !(CurrentToken() is TokenTerminal<bool>))
+                {
+                    _i++;
+                }
                 return true;
             }
             return false;
@@ -410,7 +550,28 @@ namespace MiniPL.FrontEnd
             var token = NextToken() as TokenIdentifier;
             if (token == null || !SymbolTable.FindSymbol(token.Identifier))
             {
-                ThrowParserException(token);
+                AddSyntaxError(token, "Unknown variable", false);
+                var follow = new List<string>
+                                 {
+                                    ReservedKeywords.Assignment,
+                                    ReservedKeywords.In,
+                                    ReservedKeywords.Range,
+                                    ReservedKeywords.Do,
+                                    ReservedKeywords.Semicolon,
+                                    Operators.ParenthesisRight,
+                                    Operators.Plus,
+                                    Operators.Minus,
+                                    Operators.Multiply,
+                                    Operators.Divide,
+                                    Operators.LesserThan,
+                                    Operators.GreaterThan,
+                                    Operators.LesserOrEqualThan,
+                                    Operators.GreaterOrEqualThan,
+                                    Operators.Equal,
+                                    Operators.NotEqual,
+                                    Operators.And
+                                 };
+                SkipTokens(follow);
                 return null;
             }
             return token.Identifier;
@@ -425,7 +586,10 @@ namespace MiniPL.FrontEnd
             var token = NextToken() as TokenIdentifier;
             if ( token == null || !SymbolTable.AddSymbol(token.Identifier) )
             {
-                ThrowParserException(token);
+                AddSyntaxError(token, "Variable name already in use", false);
+                var follow = new List<string> {ReservedKeywords.Colon};
+                follow.AddRange(FollowStatement);
+                SkipTokens(follow);
                 return null;
             }
             return token.Identifier;

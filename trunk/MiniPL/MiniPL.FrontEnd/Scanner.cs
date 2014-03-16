@@ -246,9 +246,9 @@ namespace MiniPL.FrontEnd
         /// <returns>New token for terminal or null</returns>
         private Token CreateTerminalToken(string line)
         {
-            if ( line[_column] == '"' ) // string
+            if (_column < line.Length &&  line[_column] == '"' ) // string
             {
-                var value = StringParse.ScanString(line, _column); // TODO: Remember that this gets the contents without the "-characters
+                var value = StringParse.ScanString(line, _column); 
                 var token = new TokenTerminal<string>(_row, _column, value);
                 _column = StringParse.SkipString(line, _column);
                 return token;
@@ -270,14 +270,13 @@ namespace MiniPL.FrontEnd
                 }
                 catch (FormatException)
                 {
-                    // TODO: Error handling
                     return null;
                 }
             }
             if (line[_column] == 't' || line[_column] == 'f') // boolean
             {
                 var lenght = 1;
-                while ( Char.IsLetter(line[_column + lenght]) )
+                while ( _column + lenght < line.Length && Char.IsLetter(line[_column + lenght]) )
                 {
                     lenght++;
                 }
@@ -291,7 +290,6 @@ namespace MiniPL.FrontEnd
                 }
                 catch ( FormatException )
                 {
-                    // TODO: Error handling
                     return null;
                 }
             }

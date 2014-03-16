@@ -9,19 +9,13 @@
     public class TokenError : Token
     {
         /// <summary>
-        /// Gets the lexeme that produced the error
-        /// </summary>
-        public string ErrorLexeme { get; private set; }
-
-        /// <summary>
         /// Creates a new error token
         /// </summary>
         /// <param name="line">Current line</param>
         /// <param name="startColumn">Starting column</param>
         /// <param name="errorLexeme">The unidentified lexeme</param>
-        public TokenError(int line, int startColumn, string errorLexeme) : base(line, startColumn)
+        public TokenError(int line, int startColumn, string errorLexeme) : base(line, startColumn, errorLexeme)
         {
-            ErrorLexeme = errorLexeme;
         }
 
 
@@ -37,7 +31,7 @@
             {
                 whiteSpaces += " ";
             }
-            ErrorLexeme += whiteSpaces + token.ErrorLexeme;
+            Lexeme += whiteSpaces + token.Lexeme;
         }
     }
 }
