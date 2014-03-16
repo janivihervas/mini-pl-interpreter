@@ -8,7 +8,7 @@ namespace MiniPL.Exceptions
     /// <summary>
     /// Represent syntax error
     /// </summary>
-    public class SyntaxError
+    public class Error
     {
         /// <summary>
         /// Gets the line where the error occured and a cursor pointing the column, f.g.:
@@ -22,7 +22,7 @@ namespace MiniPL.Exceptions
         /// </summary>
         public string ErrorMessage { get; private set; }
 
-        public SyntaxError(string line, int lineNumber, int startColumn, string errorMessage)
+        public Error(string line, int lineNumber, int startColumn, string errorMessage)
         {
             ErrorMessage = String.Format("Line {0}, column {1}: {2}", lineNumber, startColumn, errorMessage);
             var cursor = "";
@@ -34,6 +34,10 @@ namespace MiniPL.Exceptions
             LineAndErrorCursor = line + "\n" + cursor;
         }
 
+        public Error(string message)
+        {
+            ErrorMessage = message;
+        }
 
         /// <summary>
         /// Concatenates ErrorMessage and LineAndErrorCursor
@@ -43,5 +47,7 @@ namespace MiniPL.Exceptions
         {
             return ErrorMessage + "\n" + LineAndErrorCursor;
         }
+
+
     }
 }

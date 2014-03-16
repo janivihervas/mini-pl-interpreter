@@ -72,6 +72,30 @@ namespace MiniPL.AbstractSyntaxTree
             }
         }
         
+        protected Token GetFirstNotNullToken()
+        {
+            if ( FirstExpression != null && FirstExpression.GetFirstNotNullToken() != null )
+            {
+                return FirstExpression.GetFirstNotNullToken();
+            }
+            if ( FirstOperand != null )
+            {
+                return FirstOperand;
+            }
+            if ( Operator != null )
+            {
+                return Operator;
+            }
+            if ( SecondOperand != null )
+            {
+                return SecondOperand;
+            }
+            if ( SecondExpression != null && SecondExpression.GetFirstNotNullToken() != null )
+            {
+                return SecondExpression.GetFirstNotNullToken();
+            }
+            return null;
+        }
 
         /// <summary>
         /// Evaluates this expression
@@ -97,21 +121,22 @@ namespace MiniPL.AbstractSyntaxTree
             }
             if ( OperandOperand() )
             {
-                return Calculate(ExtractInt(FirstOperand), Operator.Lexeme, ExtractInt(SecondOperand));
+                return Calculate(GetFirstNotNullToken(), ExtractInt(FirstOperand), Operator.Lexeme, ExtractInt(SecondOperand));
             }
             if ( OperandExpression() )
             {
-                return Calculate(ExtractInt(FirstOperand), Operator.Lexeme, SecondExpression.EvaluateInt());
+                return Calculate(GetFirstNotNullToken(), ExtractInt(FirstOperand), Operator.Lexeme, SecondExpression.EvaluateInt());
             }
             if ( ExpressionOperand() )
             {
-                return Calculate(FirstExpression.EvaluateInt(), Operator.Lexeme, ExtractInt(SecondOperand));
+                return Calculate(GetFirstNotNullToken(), FirstExpression.EvaluateInt(), Operator.Lexeme, ExtractInt(SecondOperand));
             }
             if ( ExpressionExpression() )
             {
-                return Calculate(FirstExpression.EvaluateInt(), Operator.Lexeme, SecondExpression.EvaluateInt());
+                return Calculate(GetFirstNotNullToken(), FirstExpression.EvaluateInt(), Operator.Lexeme, SecondExpression.EvaluateInt());
             }
-            throw new AbstractSyntaxTreeException("Could not evaluate value.");
+            Statements.AddSemanticError(GetFirstNotNullToken(), "Could not evaluate value.");
+            throw new AbstractSyntaxTreeException();
         }
 
 
@@ -139,21 +164,22 @@ namespace MiniPL.AbstractSyntaxTree
             }
             if ( OperandOperand() )
             {
-                return Calculate(ExtractString(FirstOperand), Operator.Lexeme, ExtractString(SecondOperand));
+                return Calculate(GetFirstNotNullToken(), ExtractString(FirstOperand), Operator.Lexeme, ExtractString(SecondOperand));
             }
             if ( OperandExpression() )
             {
-                return Calculate(ExtractString(FirstOperand), Operator.Lexeme, ExtractString(SecondExpression));
+                return Calculate(GetFirstNotNullToken(), ExtractString(FirstOperand), Operator.Lexeme, ExtractString(SecondExpression));
             }
             if ( ExpressionOperand() )
             {
-                return Calculate(ExtractString(FirstExpression), Operator.Lexeme, ExtractString(SecondOperand));
+                return Calculate(GetFirstNotNullToken(), ExtractString(FirstExpression), Operator.Lexeme, ExtractString(SecondOperand));
             }
             if ( ExpressionExpression() )
             {
-                return Calculate(ExtractString(FirstExpression), Operator.Lexeme, ExtractString(SecondExpression));
+                return Calculate(GetFirstNotNullToken(), ExtractString(FirstExpression), Operator.Lexeme, ExtractString(SecondExpression));
             }
-            throw new AbstractSyntaxTreeException("Could not evaluate value.");
+            Statements.AddSemanticError(GetFirstNotNullToken(), "Could not evaluate value.");
+            throw new AbstractSyntaxTreeException();
         }
 
 
@@ -195,18 +221,20 @@ namespace MiniPL.AbstractSyntaxTree
             {
                 return CalculateBool(FirstExpression, Operator.Lexeme, SecondExpression);
             }
-            throw new AbstractSyntaxTreeException("Could not evaluate value.");
+            Statements.AddSemanticError(GetFirstNotNullToken(), "Could not evaluate value.");
+            throw new AbstractSyntaxTreeException();
         }
 
 
         /// <summary>
         /// Compares two integer values
         /// </summary>
+        /// <param name="token"> </param>
         /// <param name="firstValue">First value</param>
         /// <param name="op">Operator</param>
         /// <param name="secondValue">Second value</param>
         /// <returns>Comparison</returns>
-        private static bool Compare(int firstValue, string op, int secondValue)
+        private static bool Compare(Token token, int firstValue, string op, int secondValue)
         {
             switch (op)
             {
@@ -223,18 +251,21 @@ namespace MiniPL.AbstractSyntaxTree
                 case Operators.LesserOrEqualThan:
                     return firstValue <= secondValue;
             }
-            throw new AbstractSyntaxTreeCalculateException("Can't compare values int and int with operator " + op);
+            Statements.AddSemanticError(token, "Can't compare values int and int with operator " + op);
+            throw new AbstractSyntaxTreeCalculateException("");
+
         }
 
 
         /// <summary>
         /// Compares two string values
         /// </summary>
+        /// <param name="token"> </param>
         /// <param name="firstValue">First value</param>
         /// <param name="op">Operator</param>
         /// <param name="secondValue">Second value</param>
         /// <returns>Comparison</returns>
-        private static bool Compare(string firstValue, string op, string secondValue)
+        private static bool Compare(Token token, string firstValue, string op, string secondValue)
         {
             switch ( op )
             {
@@ -243,7 +274,8 @@ namespace MiniPL.AbstractSyntaxTree
                 case Operators.NotEqual:
                     return firstValue != secondValue;
             }
-            throw new AbstractSyntaxTreeCalculateException("Can't compare values string and string with operator " + op);
+            Statements.AddSemanticError(token, "Can't compare values string and string with operator " + op);
+            throw new AbstractSyntaxTreeCalculateException("");
         }
 
 
@@ -260,30 +292,34 @@ namespace MiniPL.AbstractSyntaxTree
             {
                 var b1 = ExtractBool(first);
                 var b2 = ExtractBool(second);
-                return Calculate(b1, op, b2);
+                return Calculate(first, b1, op, b2);
             }
             catch ( AbstractSyntaxTreeException )
             {
+                Statements.DeleteLastAddedError();
             }
             try
             {
                 var i1 = ExtractInt(first);
                 var i2 = ExtractInt(second);
-                return Compare(i1, op, i2);
+                return Compare(first, i1, op, i2);
             }
             catch ( AbstractSyntaxTreeException )
             {
+                Statements.DeleteLastAddedError();
             }
             try
             {
                 var s1 = ExtractString(first);
                 var s2 = ExtractString(second);
-                return Compare(s1, op, s2);
+                return Compare(first, s1, op, s2);
             }
             catch ( AbstractSyntaxTreeException )
             {
+                Statements.DeleteLastAddedError();
             }
-            throw new AbstractSyntaxTreeCalculateException("Couldn't evaluate.");
+            Statements.AddSemanticError(first, "Could not evaluate value.");
+            throw new AbstractSyntaxTreeCalculateException("");
         }
 
 
@@ -300,29 +336,33 @@ namespace MiniPL.AbstractSyntaxTree
             {
                 var b1 = ExtractBool(first);
                 var b2 = second.EvaluateBool();
-                return Calculate(b1, op, b2);
+                return Calculate(first, b1, op, b2);
             }
             catch ( AbstractSyntaxTreeException )
             {
+                Statements.DeleteLastAddedError();
             }
             try
             {
                 var i1 = ExtractInt(first);
                 var i2 = second.EvaluateInt();
-                return Compare(i1, op, i2);
+                return Compare(first, i1, op, i2);
             }
             catch ( AbstractSyntaxTreeException )
             {
+                Statements.DeleteLastAddedError();
             }
             try
             {
                 var s1 = ExtractString(first);
                 var s2 = ExtractString(second);
-                return Compare(s1, op, s2);
+                return Compare(first, s1, op, s2);
             }
             catch ( AbstractSyntaxTreeException )
             {
+                Statements.DeleteLastAddedError();
             }
+            Statements.AddSemanticError(first, "Could not evaluate value.");
             throw new AbstractSyntaxTreeCalculateException("Couldn't evaluate.");
         }
 
@@ -340,29 +380,33 @@ namespace MiniPL.AbstractSyntaxTree
             {
                 var b1 = first.EvaluateBool();
                 var b2 = ExtractBool(second);
-                return Calculate(b1, op, b2);
+                return Calculate(first.GetFirstNotNullToken(), b1, op, b2);
             }
             catch ( AbstractSyntaxTreeException )
             {
+                Statements.DeleteLastAddedError();
             }
             try
             {
                 var i1 = first.EvaluateInt();
                 var i2 = ExtractInt(second);
-                return Compare(i1, op, i2);
+                return Compare(first.GetFirstNotNullToken(), i1, op, i2);
             }
             catch ( AbstractSyntaxTreeException )
             {
+                Statements.DeleteLastAddedError();
             }
             try
             {
                 var s1 = first.EvaluateString();
                 var s2 = ExtractString(second);
-                return Compare(s1, op, s2);
+                return Compare(first.GetFirstNotNullToken(), s1, op, s2);
             }
             catch ( AbstractSyntaxTreeException )
             {
+                Statements.DeleteLastAddedError();
             }
+            Statements.AddSemanticError(first.GetFirstNotNullToken(), "Could not evaluate value.");
             throw new AbstractSyntaxTreeCalculateException("Couldn't evaluate.");
         }
 
@@ -380,29 +424,33 @@ namespace MiniPL.AbstractSyntaxTree
             {
                 var b1 = first.EvaluateBool();
                 var b2 = second.EvaluateBool();
-                return Calculate(b1, op, b2);
+                return Calculate(first.GetFirstNotNullToken(), b1, op, b2);
             }
             catch ( AbstractSyntaxTreeException )
             {
+                Statements.DeleteLastAddedError();
             }
             try
             {
                 var i1 = first.EvaluateInt();
                 var i2 = second.EvaluateInt();
-                return Compare(i1, op, i2);
+                return Compare(first.GetFirstNotNullToken(), i1, op, i2);
             }
             catch ( AbstractSyntaxTreeException )
             {
+                Statements.DeleteLastAddedError();
             }
             try
             {
                 var s1 = first.EvaluateString();
                 var s2 = second.EvaluateString();
-                return Compare(s1, op, s2);
+                return Compare(first.GetFirstNotNullToken(), s1, op, s2);
             }
             catch ( AbstractSyntaxTreeException )
             {
+                Statements.DeleteLastAddedError();
             }
+            Statements.AddSemanticError(first.GetFirstNotNullToken(), "Could not evaluate value.");
             throw new AbstractSyntaxTreeCalculateException("Couldn't evaluate.");
         }
 
@@ -410,11 +458,12 @@ namespace MiniPL.AbstractSyntaxTree
         /// <summary>
         /// Calculates boolean value from two operands
         /// </summary>
+        /// <param name="token"> </param>
         /// <param name="firstValue">First value</param>
         /// <param name="op">Operator</param>
         /// <param name="secondValue">Second value</param>
         /// <returns>Result</returns>
-        private static bool Calculate(bool firstValue, string op, bool secondValue)
+        private static bool Calculate(Token token, bool firstValue, string op, bool secondValue)
         {
             switch (op)
             {
@@ -425,18 +474,20 @@ namespace MiniPL.AbstractSyntaxTree
                 case Operators.And:
                     return firstValue != secondValue;
             }
-            throw new AbstractSyntaxTreeCalculateException(String.Format("Can't apply operator '{0}' to operands 'bool' and 'bool'.", op));
+            Statements.AddSemanticError(token, String.Format("Can't apply operator '{0}' to operands 'bool' and 'bool'.", op));
+            throw new AbstractSyntaxTreeCalculateException("");
         }
 
 
         /// <summary>
         /// Calculates integer value from two operands
         /// </summary>
+        /// <param name="token"> </param>
         /// <param name="firstValue">First value</param>
         /// <param name="op">Operator</param>
         /// <param name="secondValue">Second value</param>
         /// <returns>Result</returns>
-        private static int Calculate(int firstValue, string op, int secondValue)
+        private static int Calculate(Token token, int firstValue, string op, int secondValue)
         {
             switch ( op )
             {
@@ -449,25 +500,27 @@ namespace MiniPL.AbstractSyntaxTree
                 case Operators.Divide:
                     return firstValue / secondValue;
             }
-            throw new AbstractSyntaxTreeCalculateException(String.Format("Can't apply operator '{0}' to operands 'int' and int'.", op));
+            Statements.AddSemanticError(token, String.Format("Can't apply operator '{0}' to operands 'int' and int'.", op));
+            throw new AbstractSyntaxTreeCalculateException("");
         }
-
 
 
         /// <summary>
         /// Calculates string value from two operands
         /// </summary>
+        /// <param name="token"> </param>
         /// <param name="firstValue">First value</param>
         /// <param name="op">Operator</param>
         /// <param name="secondValue">Second value</param>
         /// <returns>Result</returns>
-        private static string Calculate(string firstValue, string op, string secondValue)
+        private static string Calculate(Token token, string firstValue, string op, string secondValue)
         {
             if (op == Operators.Plus)
             {
                 return firstValue + secondValue;
             }
-            throw new AbstractSyntaxTreeCalculateException(String.Format("Can't apply operator '{0}' to a string operation.", op));
+            Statements.AddSemanticError(token, String.Format("Can't apply operator '{0}' to a string operation.", op));
+            throw new AbstractSyntaxTreeCalculateException("");
         }
 
 
@@ -492,7 +545,8 @@ namespace MiniPL.AbstractSyntaxTree
                     return variable.Value;
                 }
             }
-            throw new AbstractSyntaxTreeException("Was expecting an int value.");
+            Statements.AddSemanticError(token, "Was expecting an int value.");
+            throw new AbstractSyntaxTreeException("");
         }
 
 
@@ -512,10 +566,20 @@ namespace MiniPL.AbstractSyntaxTree
             var tokenIdentifier = token as TokenIdentifier;
             if ( tokenIdentifier != null )
             {
-                var variable = Statement.GetVariable(tokenIdentifier.Identifier) as VariableType<string>;
-                if ( variable != null )
+                var s = Statement.GetVariable(tokenIdentifier.Identifier) as VariableType<string>;
+                if ( s != null )
                 {
-                    return variable.Value;
+                    return s.Value;
+                }
+                var i = Statement.GetVariable(tokenIdentifier.Identifier) as VariableType<int>;
+                if ( i != null )
+                {
+                    return i.Value.ToString();
+                }
+                var b = Statement.GetVariable(tokenIdentifier.Identifier) as VariableType<bool>;
+                if ( b != null )
+                {
+                    return b.Value.ToString().ToLower();
                 }
             }
             try
@@ -523,14 +587,19 @@ namespace MiniPL.AbstractSyntaxTree
                 return ExtractInt(token).ToString();
             }
             catch ( AbstractSyntaxTreeException )
-            { }
+            {
+                Statements.DeleteLastAddedError();
+            }
             try
             {
                 return ExtractBool(token).ToString().ToLower();
             }
             catch ( AbstractSyntaxTreeException )
-            { }
-            throw new AbstractSyntaxTreeException("Was expecting a string value.");
+            {
+                Statements.DeleteLastAddedError();
+            }
+            Statements.AddSemanticError(token, "Was expecting a string value.");
+            throw new AbstractSyntaxTreeException("");
         }
 
 
@@ -547,6 +616,7 @@ namespace MiniPL.AbstractSyntaxTree
             }
             catch ( AbstractSyntaxTreeException )
             {
+                Statements.DeleteLastAddedError();
             }
             try
             {
@@ -554,6 +624,7 @@ namespace MiniPL.AbstractSyntaxTree
             }
             catch ( AbstractSyntaxTreeException )
             {
+                Statements.DeleteLastAddedError();
             }
             return expression.EvaluateString();
         }
@@ -581,7 +652,8 @@ namespace MiniPL.AbstractSyntaxTree
                     return variable.Value;
                 }
             }
-            throw new AbstractSyntaxTreeException("Was expecting a boolean value.");
+            Statements.AddSemanticError(token, "Was expecting a boolean value.");
+            throw new AbstractSyntaxTreeException("");
         }
 
         

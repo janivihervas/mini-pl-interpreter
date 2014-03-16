@@ -26,6 +26,7 @@ namespace MiniPL.UnitTests
             _scanner = new Scanner();
             _parser = new Parser();
             Statement.DeleteAllVariables();
+            Statements.ClearErrors();
         }
 
         [Test]
@@ -318,6 +319,37 @@ namespace MiniPL.UnitTests
 
             Assert.NotNull(variable2);
             Assert.AreEqual(false, variable2.Value);
+        }
+
+        [Test] 
+        public void TestCanHandleSemanticErrors()
+        {
+            var lines = new List<string>
+                            {
+                                "var s : string := true;",  // This is NOT an error, as ints and booleans have string representations
+                                "var i : int := \"printing test\";",
+                                "var b : bool := 2;",
+                                "var b2 : bool := 2 + true;",
+                                "var i2 : int := 2 + true;",
+                                "var i3 : int;",
+                                "for i3 in s..\"kapow!\" do", // Stops execution on the first semantic error
+                                "    print s;",
+                                "end for;"
+                            };
+            try
+            {
+                var ast = _parser.Parse(_scanner.Tokenize(lines));
+                ast.Execute();
+                Assert.Fail("Did not throw exception.");
+            }
+            catch (AbstractSyntaxTreeException e)
+            {
+                var errors = e.Errors;
+                Assert.NotNull(errors);
+                Assert.AreEqual(5, errors.Count);
+            }
+            
+
         }
     }
 }

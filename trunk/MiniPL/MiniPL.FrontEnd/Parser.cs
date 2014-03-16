@@ -16,7 +16,7 @@ namespace MiniPL.FrontEnd
     {
         private int _i;
         private List<Token> _tokens;
-        private List<SyntaxError> _syntaxErrors;
+        private List<Error> _syntaxErrors;
 
         private static readonly List<string> FirstStatement = new List<string>
                                                              {
@@ -56,7 +56,7 @@ namespace MiniPL.FrontEnd
                 throw new ParserException("Token list was null");
             }
             SymbolTable.DeleteAllSymbols();
-            _syntaxErrors = new List<SyntaxError>();
+            _syntaxErrors = new List<Error>();
             _tokens = tokens;
             _i = 0;
             var rootNode = Statements();
@@ -168,29 +168,29 @@ namespace MiniPL.FrontEnd
             if (token == null)
             {
                 _syntaxErrors.Add(
-                    new SyntaxError(Scanner.Lines[Scanner.Lines.Count - 1], Scanner.Lines.Count - 1, Scanner.Lines[Scanner.Lines.Count - 1].Length, String.Format("Unexpected end of file, was expecting {0}.", expectedLexeme)));
+                    new Error(Scanner.Lines[Scanner.Lines.Count - 1], Scanner.Lines.Count - 1, Scanner.Lines[Scanner.Lines.Count - 1].Length, String.Format("Unexpected end of file, was expecting {0}.", expectedLexeme)));
                 return;
             }
             if (useDefault)
             {
                 _syntaxErrors.Add(
-                    new SyntaxError(Scanner.Lines[token.Line - 1], token.Line, token.StartColumn, String.Format("Was expecting {0}.", expectedLexeme)));
+                    new Error(Scanner.Lines[token.Line - 1], token.Line, token.StartColumn, String.Format("Was expecting {0}.", expectedLexeme)));
             }
             else
             {
                 _syntaxErrors.Add(
-                    new SyntaxError(Scanner.Lines[token.Line - 1], token.Line, token.StartColumn, expectedLexeme));
+                    new Error(Scanner.Lines[token.Line - 1], token.Line, token.StartColumn, expectedLexeme));
 
             }
         }
 
-        
+
         /// <summary>
         /// Handles the "stmts" production
         /// </summary>
         private Statements Statements()
         {
-            var node = new Statements();
+            var node = new Statements(Scanner.Lines);
             while (_i < _tokens.Count)
             {
                 node.AddStatement(Statement());

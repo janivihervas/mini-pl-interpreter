@@ -14,7 +14,7 @@ namespace MiniPL.Exceptions
         /// <summary>
         /// Gets the syntax errors
         /// </summary>
-        public List<SyntaxError> Errors { get; private set; }
+        public List<Error> Errors { get; private set; }
 
         /// <summary>
         /// Error message
@@ -28,7 +28,7 @@ namespace MiniPL.Exceptions
         public ParserException(string message)
         {
             _message = message;
-            Errors = new List<SyntaxError>();
+            Errors = new List<Error>();
         }
 
 
@@ -36,10 +36,10 @@ namespace MiniPL.Exceptions
         /// Creates a new parser exception
         /// </summary>
         /// <param name="errors">Syntax errors</param>
-        public ParserException(List<SyntaxError> errors)
+        public ParserException(List<Error> errors)
             : base(_message)
         {
-            Errors = errors ?? new List<SyntaxError>();
+            Errors = errors ?? new List<Error>();
         }
 
 
